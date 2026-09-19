@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Bear in a red hat and blue duffle coat">
+  <defs>
+    <clipPath id="frame">
+      <rect width="200" height="200" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <!-- Warm ground -->
+    <rect width="200" height="200" fill="#ede2d3" />
+
+    <!-- Ears -->
+    <circle cx="58" cy="66" r="19" fill="#8b5e3c" />
+    <circle cx="142" cy="66" r="19" fill="#8b5e3c" />
+    <circle cx="58" cy="66" r="9" fill="#a97a52" />
+    <circle cx="142" cy="66" r="9" fill="#a97a52" />
+
+    <!-- Head -->
+    <circle cx="100" cy="108" r="54" fill="#8b5e3c" />
+
+    <!-- Muzzle -->
+    <ellipse cx="100" cy="128" rx="31" ry="24" fill="#c8a882" />
+
+    <!-- Eyes -->
+    <circle cx="80" cy="99" r="6.5" fill="#2b1d14" />
+    <circle cx="120" cy="99" r="6.5" fill="#2b1d14" />
+    <circle cx="82" cy="97" r="2.2" fill="#fffdfa" />
+    <circle cx="122" cy="97" r="2.2" fill="#fffdfa" />
+
+    <!-- Nose and mouth -->
+    <ellipse cx="100" cy="117" rx="10.5" ry="8" fill="#2b1d14" />
+    <path d="M100 125 v7" stroke="#2b1d14" stroke-width="3" stroke-linecap="round" />
+    <path d="M100 132 q-9 8 -16 1" stroke="#2b1d14" stroke-width="3" fill="none" stroke-linecap="round" />
+    <path d="M100 132 q9 8 16 1" stroke="#2b1d14" stroke-width="3" fill="none" stroke-linecap="round" />
+
+    <!-- Blue duffle coat -->
+    <path d="M18 200 q6 -40 42 -50 h80 q36 10 42 50 Z" fill="#2f5f92" />
+    <path d="M60 150 q40 26 80 0 l-6 -8 q-34 20 -68 0 Z" fill="#26507c" />
+    <circle cx="76" cy="180" r="5" fill="#e8b04b" />
+    <circle cx="124" cy="180" r="5" fill="#e8b04b" />
+
+    <!-- Red bush hat -->
+    <ellipse cx="100" cy="54" rx="63" ry="13" fill="#b8352a" />
+    <path d="M67 54 q0 -38 33 -38 q33 0 33 38 Z" fill="#c0392b" />
+    <path d="M67 46 q33 10 66 0 q1 5 0 8 q-33 10 -66 0 Z" fill="#a12d24" />
+  </g>
+</svg>

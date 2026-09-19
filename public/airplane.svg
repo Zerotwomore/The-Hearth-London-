@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Aeroplane flying above the clouds">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7fb3dd" />
+      <stop offset="55%" stop-color="#a9cfe8" />
+      <stop offset="100%" stop-color="#e6d8c4" />
+    </linearGradient>
+    <clipPath id="crop">
+      <rect width="200" height="200" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#crop)">
+    <rect width="200" height="200" fill="url(#sky)" />
+
+    <!-- Low sun glow -->
+    <circle cx="150" cy="150" r="46" fill="#e8b04b" opacity="0.35" />
+    <circle cx="150" cy="150" r="26" fill="#e8b04b" opacity="0.5" />
+
+    <!-- Clouds -->
+    <g fill="#fffdfa" opacity="0.85">
+      <ellipse cx="42" cy="150" rx="34" ry="14" />
+      <ellipse cx="66" cy="142" rx="22" ry="12" />
+      <ellipse cx="160" cy="176" rx="40" ry="15" />
+      <ellipse cx="128" cy="182" rx="26" ry="11" />
+    </g>
+    <g fill="#fffdfa" opacity="0.5">
+      <ellipse cx="150" cy="46" rx="30" ry="10" />
+      <ellipse cx="128" cy="40" rx="18" ry="8" />
+    </g>
+
+    <!-- Contrail -->
+    <path d="M14 128 Q 60 116 96 100" stroke="#fffdfa" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.55" />
+
+    <!-- Aeroplane, climbing to the right -->
+    <g transform="translate(100 92) rotate(-24)">
+      <!-- Wings -->
+      <path d="M-6 0 L-30 26 L-16 26 L8 6 Z" fill="#d8dee4" />
+      <path d="M-4 -2 L-26 -26 L-12 -26 L10 -6 Z" fill="#eef2f5" />
+      <!-- Fuselage -->
+      <path d="M-46 4 Q-40 -4 -20 -5 L34 -7 Q50 -7 52 0 Q50 7 34 7 L-20 5 Q-40 4 -46 4 Z" fill="#fffdfa" />
+      <!-- Tail fin -->
+      <path d="M-46 4 L-56 -16 L-46 -16 L-34 -3 Z" fill="#c0392b" />
+      <!-- Windows -->
+      <g fill="#5b7f9c">
+        <circle cx="8" cy="-1" r="2" />
+        <circle cx="17" cy="-1" r="2" />
+        <circle cx="26" cy="-1.5" r="2" />
+      </g>
+      <!-- Nose -->
+      <circle cx="46" cy="0" r="3.5" fill="#5b7f9c" opacity="0.6" />
+    </g>
+  </g>
+</svg>

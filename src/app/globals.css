@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm hearth ground */
+  --color-hearth-cream: #f7f1e8;
+  --color-hearth-cream-dark: #ede2d3;
+  --color-hearth-paper: #fffdfa;
+
+  /* Editorial ink */
+  --color-hearth-ink: #1c1815;
+  --color-hearth-charcoal: #3a2e27;
+  --color-hearth-charcoal-soft: #6b5b4f;
+
+  /* Accents */
+  --color-hearth-ember: #c1502e;
+  --color-hearth-ember-light: #e08a5b;
+  --color-hearth-amber: #d89a4b;
+  --color-hearth-gold: #b08d4f;
+  --color-hearth-clay: #8c5a45;
+  --color-hearth-success: #6b8f5a;
+
+  --font-heading: var(--font-fraunces), "Songti SC", "STSong", "Noto Serif SC",
+    "Source Han Serif SC", serif;
+  --font-body: var(--font-figtree), "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", sans-serif;
+
+  --radius-card: 1rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 4px 20px -6px rgba(28, 24, 21, 0.14);
+  --shadow-frame: 0 10px 30px -8px rgba(28, 24, 21, 0.28);
+}
+
+html {
+  background: var(--color-hearth-cream);
+}
+
+body {
+  background: var(--color-hearth-cream);
+  color: var(--color-hearth-ink);
+  font-family: var(--font-body);
+}
+
+/* Editorial display type — tight, large, confident */
+.display {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+/* Bilingual eyebrow label */
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Gallery frame treatment for poster imagery */
+.frame {
+  box-shadow: var(--shadow-frame);
+  border: 3px solid var(--color-hearth-gold);
+  outline: 1px solid rgba(28, 24, 21, 0.15);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
