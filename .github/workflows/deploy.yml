@@ -32,8 +32,10 @@ jobs:
       - name: Build static export
         env:
           NEXT_EXPORT: "true"
-          # Pages serves this repo from /Concept-Hearth-London/
-          NEXT_PUBLIC_BASE_PATH: /Concept-Hearth-London
+          # Pages serves a project site from /<repo-name>/. Derive it from
+          # the repo this workflow is actually running in, so a fork or a
+          # rename doesn't silently ship a wrong, hardcoded base path again.
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build
 
       - name: Add .nojekyll
