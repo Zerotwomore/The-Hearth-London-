@@ -6,12 +6,10 @@ import { useAppState } from "@/lib/context/AppStateContext";
 import { getCategoryLabel } from "@/lib/data/categories";
 import { formatEventDateTime } from "@/lib/utils";
 import { AttendeeAvatarStack } from "@/components/events/AttendeeAvatarStack";
-import { VipBadge } from "@/components/ui/VipBadge";
 
 export function EventCard({ event }: { event: EventItem }) {
-  const { tx, t, isEventJoined, lang, isVip } = useAppState();
+  const { tx, t, isEventJoined, lang } = useAppState();
   const joined = isEventJoined(event.id);
-  const showVipPrice = isVip && event.vipPrice;
 
   return (
     <Link href={`/events/${event.id}`} className="group block">
@@ -26,18 +24,10 @@ export function EventCard({ event }: { event: EventItem }) {
           <span className="absolute left-2 top-2 rounded-pill bg-hearth-ink/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-hearth-paper">
             {tx(getCategoryLabel(event.category))}
           </span>
-          {joined ? (
+          {joined && (
             <span className="absolute right-2 top-2 rounded-pill bg-hearth-success px-2.5 py-1 text-[10px] font-semibold text-hearth-paper">
               {t("joined")}
             </span>
-          ) : (
-            event.vipOnly && (
-              <VipBadge
-                label={t("vip")}
-                solid
-                className="absolute right-2 top-2"
-              />
-            )
           )}
         </div>
 
@@ -53,20 +43,9 @@ export function EventCard({ event }: { event: EventItem }) {
           </p>
           <div className="mt-2.5 flex items-center justify-between">
             <AttendeeAvatarStack attendeeIds={event.attendeeIds} max={3} />
-            {showVipPrice ? (
-              <span className="flex items-baseline gap-1.5">
-                <span className="text-[12px] text-hearth-charcoal-soft line-through">
-                  {tx(event.price)}
-                </span>
-                <span className="text-[13px] font-semibold text-hearth-gold">
-                  {tx(event.vipPrice!)}
-                </span>
-              </span>
-            ) : (
-              <span className="text-[13px] font-semibold text-hearth-ember">
-                {tx(event.price)}
-              </span>
-            )}
+            <span className="text-[13px] font-semibold text-hearth-ember">
+              {tx(event.price)}
+            </span>
           </div>
         </div>
       </article>
