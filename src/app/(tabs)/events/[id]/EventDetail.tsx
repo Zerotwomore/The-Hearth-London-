@@ -9,13 +9,12 @@ import { useAppState } from "@/lib/context/AppStateContext";
 import { formatFullDate, formatTimeRange } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
-import { VipBadge } from "@/components/ui/VipBadge";
 import { JoinButton } from "@/components/events/JoinButton";
 import { TopBar } from "@/components/ui/TopBar";
 
 export default function EventDetail({ id }: { id: string }) {
   const event = getEventById(id);
-  const { tx, t, lang, isVip } = useAppState();
+  const { tx, t, lang } = useAppState();
 
   if (!event) notFound();
 
@@ -45,36 +44,17 @@ export default function EventDetail({ id }: { id: string }) {
             {formatFullDate(event.dateTime, lang)} ·{" "}
             {formatTimeRange(event.dateTime, event.endTime, lang)}
           </p>
-          <div className="mt-2 flex items-start gap-2">
-            <h2 className="display flex-1 text-[26px] text-hearth-ink">
-              {tx(event.title)}
-            </h2>
-            {event.vipOnly && (
-              <VipBadge label={t("vipOnlyEvent")} className="mt-1.5" />
-            )}
-          </div>
+          <h2 className="display mt-2 text-[26px] text-hearth-ink">
+            {tx(event.title)}
+          </h2>
           <p className="mt-2 text-[15px] text-hearth-charcoal-soft">
             {tx(event.location.name)} · {tx(event.location.area)}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-hearth-ink/10 py-3">
-            {isVip && event.vipPrice ? (
-              <span className="flex items-baseline gap-2">
-                <span className="text-[14px] text-hearth-charcoal-soft line-through">
-                  {tx(event.price)}
-                </span>
-                <span className="text-[15px] font-semibold text-hearth-gold">
-                  {tx(event.vipPrice)}
-                </span>
-                <span className="text-[11px] uppercase tracking-widest text-hearth-gold">
-                  {t("vipSaving")}
-                </span>
-              </span>
-            ) : (
-              <span className="text-[15px] font-semibold text-hearth-ember">
-                {tx(event.price)}
-              </span>
-            )}
+            <span className="text-[15px] font-semibold text-hearth-ember">
+              {tx(event.price)}
+            </span>
             <span className="text-[13px] text-hearth-charcoal-soft">
               {event.attendeeIds.length} {t("going")}
             </span>

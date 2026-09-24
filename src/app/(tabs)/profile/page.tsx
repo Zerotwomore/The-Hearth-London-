@@ -6,7 +6,6 @@ import { TopBar } from "@/components/ui/TopBar";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
-import { VipBadge } from "@/components/ui/VipBadge";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EventCard } from "@/components/events/EventCard";
@@ -30,7 +29,6 @@ export default function ProfilePage() {
     tx,
     profileDraft,
     authProvider,
-    isVip,
     signOut,
     joinedEventIds,
     joinedClubIds,
@@ -60,7 +58,6 @@ export default function ProfilePage() {
             <h2 className="display flex flex-wrap items-center gap-1.5 text-[22px] text-hearth-ink">
               {profileDraft.name}
               {profileDraft.verified && <VerifiedBadge size="md" />}
-              {isVip && <VipBadge label={t("vip")} solid />}
             </h2>
             {authProvider && (
               <p className="mt-1 text-[12px] text-hearth-charcoal-soft">
@@ -103,48 +100,6 @@ export default function ProfilePage() {
             </Link>
           </div>
         </div>
-
-        <Link
-          href="/vip"
-          className={
-            isVip
-              ? "mt-6 flex items-center justify-between gap-3 rounded-card border border-hearth-gold/50 bg-hearth-gold/10 px-4 py-3.5"
-              : "mt-6 flex items-center justify-between gap-3 rounded-card bg-hearth-ink px-4 py-3.5 text-hearth-paper"
-          }
-        >
-          <span className="min-w-0">
-            <span className="flex items-center gap-2">
-              <VipBadge label={t("vip")} solid />
-              <span
-                className={
-                  isVip
-                    ? "text-[15px] font-semibold text-hearth-ink"
-                    : "text-[15px] font-semibold text-hearth-paper"
-                }
-              >
-                {isVip ? t("vipActive") : t("vipTitle")}
-              </span>
-            </span>
-            <span
-              className={
-                isVip
-                  ? "mt-1 block text-[12px] text-hearth-charcoal-soft"
-                  : "mt-1 block text-[12px] text-hearth-paper/70"
-              }
-            >
-              {isVip ? t("vipManage") : t("vipUpsell")}
-            </span>
-          </span>
-          <span
-            className={
-              isVip
-                ? "shrink-0 text-[13px] font-medium text-hearth-gold"
-                : "shrink-0 text-[13px] font-medium text-hearth-gold"
-            }
-          >
-            {t("vipSeeBenefits")} →
-          </span>
-        </Link>
 
         {interests.length > 0 && (
           <section className="pt-6">
