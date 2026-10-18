@@ -1,17 +1,17 @@
 "use client";
 
 import { Chip } from "@/components/ui/Chip";
-import { CATEGORIES } from "@/lib/data/categories";
+import { useCategories } from "@/lib/api/events";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { EventCategory } from "@/lib/types/event";
 
 interface EventFilterBarProps {
-  active: EventCategory | "all";
-  onChange: (category: EventCategory | "all") => void;
+  active: string | "all";
+  onChange: (categoryId: string | "all") => void;
 }
 
 export function EventFilterBar({ active, onChange }: EventFilterBarProps) {
   const { t, tx } = useAppState();
+  const { data: categories = [] } = useCategories();
 
   return (
     <div className="no-scrollbar -mx-5 overflow-x-auto px-5">
@@ -19,7 +19,7 @@ export function EventFilterBar({ active, onChange }: EventFilterBarProps) {
         <Chip selected={active === "all"} onClick={() => onChange("all")}>
           {t("allCategories")}
         </Chip>
-        {CATEGORIES.map((category) => (
+        {categories.map((category) => (
           <Chip
             key={category.id}
             selected={active === category.id}

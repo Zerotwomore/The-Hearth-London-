@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Figtree } from "next/font/google";
 import "./globals.css";
-import { AppStateProvider } from "@/lib/context/AppStateContext";
+import { Providers } from "@/app/providers";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -16,6 +16,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://thehearthlondon.com"),
   title: "The Hearth London",
   description: "Meet people over dinners, hikes, board games and more in London.",
 };
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${fraunces.variable} ${figtree.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-hearth-cream text-hearth-ink">
-        <AppStateProvider>{children}</AppStateProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

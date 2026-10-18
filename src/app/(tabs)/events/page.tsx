@@ -5,23 +5,25 @@ import { TopBar } from "@/components/ui/TopBar";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { EventCard } from "@/components/events/EventCard";
 import { EventFilterBar } from "@/components/events/EventFilterBar";
-import { EVENTS } from "@/lib/data/events";
-import { EventCategory } from "@/lib/types/event";
+import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
+import { useEvents, useMyEventIds } from "@/lib/api/events";
 import { useAppState } from "@/lib/context/AppStateContext";
 
 export default function EventsPage() {
   const { t } = useAppState();
-  const [category, setCategory] = useState<EventCategory | "all">("all");
+  const [category, setCategory] = useState<string | "all">("all");
   const [query, setQuery] = useState("");
+  const eventsQuery = useEvents();
+  const { data: myEventIds } = useMyEventIds();
 
   const events = useMemo(() => {
-    return EVENTS.filter((event) => {
-      const matchesCategory = category === "all" || event.category === category;
+    return (eventsQuery.data ?? []).filter((event) => {
+      const matchesCategory = category === "all" || event.categoryId === category;
       const haystack = `${event.title.en} ${event.title.zh} ${event.location.area.en} ${event.location.area.zh}`.toLowerCase();
       const matchesQuery = haystack.includes(query.trim().toLowerCase());
       return matchesCategory && matchesQuery;
     });
-  }, [category, query]);
+  }, [eventsQuery.data, category, query]);
 
   return (
     <>
@@ -58,14 +60,18 @@ export default function EventsPage() {
 
         <EventFilterBar active={category} onChange={setCategory} />
 
-        {events.length === 0 ? (
-          <p className="mt-10 text-center text-[15px] text-hearth-charcoal-soft">
-            {t("noEvents")}
-          </p>
+        {eventsQuery.isPending ? (
+          <LoadingState />
+        ) : eventsQuery.isError ? (
+          <ErrorState onRetry={() => eventsQuery.refetch()} />
+        ) : eventsQuery.data.length === 0 ? (
+          <StatusMessage>{t("noUpcomingEvents")}</StatusMessage>
+        ) : events.length === 0 ? (
+          <StatusMessage>{t("noEvents")}</StatusMessage>
         ) : (
           <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-7">
             {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.id} event={event} joined={myEventIds?.has(event.id)} />
             ))}
           </div>
         )}

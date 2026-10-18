@@ -1,28 +1,33 @@
 import { LocalizedText } from "@/lib/types/i18n";
+import { Profile } from "@/lib/types/user";
 
 export interface Message {
   id: string;
-  senderId: string;
+  /** Null when the sender has deleted their account. */
+  senderId: string | null;
+  sender?: Profile;
   /**
    * Written in whatever language the sender used — messages are never
-   * translated by the EN / 中文 toggle.
+   * translated by the EN / 中文 toggle. Null for a photo-only message.
    */
-  text: string;
+  body: string | null;
+  hasImage: boolean;
   sentAt: string;
 }
 
-export interface Conversation {
+/** One row of the chat tab: an event group chat the member belongs to. */
+export interface ConversationSummary {
   id: string;
-  participantIds: string[];
-  messages: Message[];
-  /** Set when this thread is the group chat for an event. */
-  eventId?: string;
-  /** Overrides the derived title; falls back to the event or other participant. */
-  title?: LocalizedText;
-  /** Messages waiting to be read; cleared once the thread is opened. */
-  unreadCount?: number;
-}
-
-export function isGroupConversation(conversation: Conversation): boolean {
-  return Boolean(conversation.eventId) || conversation.participantIds.length > 2;
+  eventId: string;
+  title: LocalizedText;
+  posterUrl: string;
+  startsAt: string;
+  /** False once the chat has gone read-only, a week after the event. */
+  isOpen: boolean;
+  lastMessageAt?: string;
+  lastMessageBody?: string | null;
+  lastMessageHasImage: boolean;
+  lastSenderId?: string | null;
+  /** Capped at 100 by the database. */
+  unreadCount: number;
 }

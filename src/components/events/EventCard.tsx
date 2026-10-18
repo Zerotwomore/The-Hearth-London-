@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { EventItem } from "@/lib/types/event";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { getCategoryLabel } from "@/lib/data/categories";
+import { useCategories } from "@/lib/api/events";
 import { formatEventDateTime } from "@/lib/utils";
 import { AttendeeAvatarStack } from "@/components/events/AttendeeAvatarStack";
 
-export function EventCard({ event }: { event: EventItem }) {
-  const { tx, t, isEventJoined, lang } = useAppState();
-  const joined = isEventJoined(event.id);
+export function EventCard({ event, joined = false }: { event: EventItem; joined?: boolean }) {
+  const { tx, t, lang } = useAppState();
+  const { data: categories } = useCategories();
+  const category = categories?.find((item) => item.id === event.categoryId);
 
   return (
     <Link href={`/events/${event.id}`} className="group block">
@@ -21,9 +22,11 @@ export function EventCard({ event }: { event: EventItem }) {
             alt={tx(event.title)}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
-          <span className="absolute left-2 top-2 rounded-pill bg-hearth-ink/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-hearth-paper">
-            {tx(getCategoryLabel(event.category))}
-          </span>
+          {category && (
+            <span className="absolute left-2 top-2 rounded-pill bg-hearth-ink/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-hearth-paper">
+              {tx(category.label)}
+            </span>
+          )}
           {joined && (
             <span className="absolute right-2 top-2 rounded-pill bg-hearth-success px-2.5 py-1 text-[10px] font-semibold text-hearth-paper">
               {t("joined")}
@@ -33,7 +36,7 @@ export function EventCard({ event }: { event: EventItem }) {
 
         <div className="mt-3">
           <p className="eyebrow text-hearth-gold">
-            {formatEventDateTime(event.dateTime, lang)}
+            {formatEventDateTime(event.startsAt, lang)}
           </p>
           <h3 className="display mt-1 line-clamp-2 text-[17px] text-hearth-ink">
             {tx(event.title)}
@@ -42,7 +45,7 @@ export function EventCard({ event }: { event: EventItem }) {
             {tx(event.location.name)} · {tx(event.location.area)}
           </p>
           <div className="mt-2.5 flex items-center justify-between">
-            <AttendeeAvatarStack attendeeIds={event.attendeeIds} max={3} />
+            <AttendeeAvatarStack people={event.attendees} max={3} />
             <span className="text-[13px] font-semibold text-hearth-ember">
               {tx(event.price)}
             </span>

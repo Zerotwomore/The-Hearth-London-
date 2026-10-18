@@ -5,9 +5,8 @@ import { Club } from "@/lib/types/club";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { AttendeeAvatarStack } from "@/components/events/AttendeeAvatarStack";
 
-export function ClubCard({ club }: { club: Club }) {
-  const { tx, t, isClubJoined } = useAppState();
-  const joined = isClubJoined(club.id);
+export function ClubCard({ club, joined = false }: { club: Club; joined?: boolean }) {
+  const { tx, t } = useAppState();
 
   return (
     <Link href={`/clubs/${club.id}`} className="group block">
@@ -29,10 +28,14 @@ export function ClubCard({ club }: { club: Club }) {
             {tx(club.description)}
           </p>
           <div className="mt-2 flex items-center gap-2">
-            <AttendeeAvatarStack attendeeIds={club.memberIds} max={4} />
-            <span className="text-[12px] text-hearth-charcoal-soft">
-              {club.memberIds.length} {t("members")}
-            </span>
+            {club.members.length > 0 && (
+              <>
+                <AttendeeAvatarStack people={club.members} max={4} />
+                <span className="text-[12px] text-hearth-charcoal-soft">
+                  {club.members.length} {t("members")}
+                </span>
+              </>
+            )}
             {joined && (
               <span className="ml-auto rounded-pill bg-hearth-success/15 px-2 py-0.5 text-[11px] font-semibold text-hearth-success">
                 {t("joinedClub")}

@@ -6,11 +6,12 @@ import { useAppState } from "@/lib/context/AppStateContext";
 
 export default function RootPage() {
   const router = useRouter();
-  const { hasOnboarded } = useAppState();
+  const { authReady, userId, profile, profileLoading } = useAppState();
 
   useEffect(() => {
-    router.replace(hasOnboarded ? "/events" : "/onboarding");
-  }, [hasOnboarded, router]);
+    if (!authReady || profileLoading) return;
+    router.replace(userId && profile?.onboardedAt ? "/events" : "/onboarding");
+  }, [authReady, userId, profile, profileLoading, router]);
 
   return (
     <div className="flex min-h-dvh items-center justify-center">

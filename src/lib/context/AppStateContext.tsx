@@ -2,235 +2,142 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   ReactNode,
 } from "react";
-import { getConversationById } from "@/lib/data/conversations";
-import { CURRENT_USER_ID, getCurrentUser } from "@/lib/data/users";
-import { Message } from "@/lib/types/chat";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { isSupabaseConfigured, supabase } from "@/lib/api/supabase";
+import { fetchOwnProfile, saveLanguage } from "@/lib/api/profile";
 import { Lang, LocalizedText, pick } from "@/lib/types/i18n";
+import { OwnProfile } from "@/lib/types/user";
 import { StringKey, t as translate } from "@/lib/i18n/strings";
 
-interface ProfileDraft {
-  name: string;
-  avatarUrl: string;
-  bio: string;
-  verified?: boolean;
-}
-
-export type AuthProvider = "wechat" | "apple" | "email" | "guest";
-
-interface AppState {
+interface AppStateContextValue {
   lang: Lang;
-  authProvider: AuthProvider | null;
-  joinedEventIds: string[];
-  joinedClubIds: string[];
-  selectedInterestIds: string[];
-  hasOnboarded: boolean;
-  profileDraft: ProfileDraft;
-  /**
-   * Only messages sent from this device. Seeded history always comes from the
-   * fixtures, so editing them is reflected immediately rather than being
-   * shadowed by saved state.
-   */
-  sentMessagesById: Record<string, Message[]>;
-  /** Threads whose unread badge has been cleared by opening them. */
-  readConversationIds: string[];
-}
-
-interface AppStateContextValue extends AppState {
-  signInAs: (provider: AuthProvider) => void;
-  signOut: () => void;
   setLang: (lang: Lang) => void;
   toggleLang: () => void;
   t: (key: StringKey) => string;
   tx: (text: LocalizedText) => string;
-  toggleJoinEvent: (eventId: string) => void;
-  toggleJoinClub: (clubId: string) => void;
-  toggleInterest: (interestId: string) => void;
-  completeOnboarding: (draft: ProfileDraft) => void;
-  sendMessage: (conversationId: string, text: string) => void;
-  /** Fixture history plus anything sent from this device. */
-  getMessages: (conversationId: string) => Message[];
-  getUnreadCount: (conversationId: string) => number;
-  markConversationRead: (conversationId: string) => void;
-  isEventJoined: (eventId: string) => boolean;
-  isClubJoined: (clubId: string) => boolean;
+  /** False until the saved session has been checked; avoid redirecting before then. */
+  authReady: boolean;
+  userId: string | null;
+  email: string | null;
+  /** The signed-in member's profile; null when signed out or still loading. */
+  profile: OwnProfile | null;
+  profileLoading: boolean;
+  refreshProfile: () => Promise<void>;
 }
 
-const STORAGE_KEY = "hearth-app-state";
+// The language choice lives in localStorage. Reading it through
+// useSyncExternalStore keeps the server render ("en") and the first browser
+// render in agreement, then switches without a hydration mismatch.
+const LANG_KEY = "hearth-lang";
+const langListeners = new Set<() => void>();
 
-/**
- * Bump whenever the mock fixtures change shape or identity (e.g. the signed-in
- * user's name or avatar). Saved state from an older version is discarded rather
- * than merged, so prototype edits always show up without clearing storage.
- */
-const STATE_VERSION = 9;
+function readStoredLang(): Lang | null {
+  try {
+    const value = window.localStorage.getItem(LANG_KEY);
+    return value === "en" || value === "zh" ? value : null;
+  } catch {
+    return null;
+  }
+}
 
-function defaultState(): AppState {
-  return {
-    lang: "en",
-    authProvider: null,
-    joinedEventIds: [],
-    joinedClubIds: [],
-    selectedInterestIds: [],
-    hasOnboarded: false,
-    profileDraft: {
-      name: "JJ",
-      avatarUrl: "/airplane.svg",
-      bio: "Young technology professional from Canada, working in London on a YMS visa, loves to walk around Canary Wharf, architecture, art galleries, and finding the best Pret a Manger sandwich.",
-      verified: true,
-    },
-    sentMessagesById: {},
-    readConversationIds: [],
-  };
+function storeLang(lang: Lang) {
+  try {
+    window.localStorage.setItem(LANG_KEY, lang);
+  } catch {
+    // storage unavailable — the choice lasts for this visit only
+  }
+  langListeners.forEach((listener) => listener());
+}
+
+function subscribeLang(listener: () => void) {
+  langListeners.add(listener);
+  return () => langListeners.delete(listener);
 }
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(defaultState);
-  const [hydrated, setHydrated] = useState(false);
+  const queryClient = useQueryClient();
+  const [authReady, setAuthReady] = useState(!isSupabaseConfigured);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    // Prototype builds kept everything in this key; it is no longer used.
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const saved = JSON.parse(raw);
-        // Only restore state written by this version of the fixtures.
-        if (saved?.version === STATE_VERSION && saved.state) {
-          setState({ ...defaultState(), ...saved.state });
-        }
-      }
+      window.localStorage.removeItem("hearth-app-state");
     } catch {
-      // corrupt or unavailable storage — fall back to defaults
+      // ignore
     }
-    setHydrated(true);
-  }, []);
+    if (!isSupabaseConfigured) return;
+    // Fires immediately with the saved session (INITIAL_SESSION), then on
+    // every sign-in, sign-out and token refresh.
+    const { data } = supabase().auth.onAuthStateChange((event, session) => {
+      setUserId(session?.user.id ?? null);
+      setEmail(session?.user.email ?? null);
+      if (event === "SIGNED_OUT") queryClient.clear();
+      setAuthReady(true);
+    });
+    return () => data.subscription.unsubscribe();
+  }, [queryClient]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ version: STATE_VERSION, state })
-      );
-    } catch {
-      // storage unavailable — prototype still works in memory
-    }
-  }, [state, hydrated]);
+  const profileQuery = useQuery({
+    queryKey: ["own-profile", userId],
+    enabled: Boolean(userId),
+    queryFn: () => fetchOwnProfile(userId!),
+  });
+  const profile = profileQuery.data ?? null;
+
+  const storedLang = useSyncExternalStore(subscribeLang, readStoredLang, () => null);
+  const lang: Lang = storedLang ?? profile?.lang ?? "en";
+
+  const setLang = useCallback(
+    (next: Lang) => {
+      storeLang(next);
+      if (userId) void saveLanguage(userId, next);
+    },
+    [userId]
+  );
+
+  const refreshProfile = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ["own-profile"] });
+  }, [queryClient]);
 
   const value = useMemo<AppStateContextValue>(
     () => ({
-      ...state,
-      // Prototype sign-in: adopt the mock user so the app has a populated
-      // identity (profile, chat threads) without any real auth.
-      signInAs: (provider) =>
-        setState((prev) => {
-          const mockUser = getCurrentUser();
-          return {
-            ...prev,
-            authProvider: provider,
-            hasOnboarded: true,
-            profileDraft: {
-              name: mockUser.name,
-              avatarUrl: mockUser.avatarUrl,
-              bio: mockUser.bio ? mockUser.bio[prev.lang] : "",
-              verified: mockUser.verified,
-            },
-            selectedInterestIds:
-              prev.selectedInterestIds.length > 0
-                ? prev.selectedInterestIds
-                : mockUser.interests,
-          };
-        }),
-      signOut: () =>
-        setState((prev) => ({
-          ...defaultState(),
-          lang: prev.lang,
-        })),
-      setLang: (lang) => setState((prev) => ({ ...prev, lang })),
-      toggleLang: () =>
-        setState((prev) => ({ ...prev, lang: prev.lang === "en" ? "zh" : "en" })),
-      t: (key) => translate(key, state.lang),
-      tx: (text) => pick(text, state.lang),
-      toggleJoinEvent: (eventId) =>
-        setState((prev) => ({
-          ...prev,
-          joinedEventIds: prev.joinedEventIds.includes(eventId)
-            ? prev.joinedEventIds.filter((id) => id !== eventId)
-            : [...prev.joinedEventIds, eventId],
-        })),
-      toggleJoinClub: (clubId) =>
-        setState((prev) => ({
-          ...prev,
-          joinedClubIds: prev.joinedClubIds.includes(clubId)
-            ? prev.joinedClubIds.filter((id) => id !== clubId)
-            : [...prev.joinedClubIds, clubId],
-        })),
-      toggleInterest: (interestId) =>
-        setState((prev) => ({
-          ...prev,
-          selectedInterestIds: prev.selectedInterestIds.includes(interestId)
-            ? prev.selectedInterestIds.filter((id) => id !== interestId)
-            : [...prev.selectedInterestIds, interestId],
-        })),
-      completeOnboarding: (draft) =>
-        setState((prev) => ({
-          ...prev,
-          hasOnboarded: true,
-          authProvider: prev.authProvider ?? "guest",
-          profileDraft: draft,
-        })),
-      sendMessage: (conversationId, text) =>
-        setState((prev) => {
-          const existing = prev.sentMessagesById[conversationId] ?? [];
-          const message: Message = {
-            id: `local-${Date.now()}`,
-            senderId: CURRENT_USER_ID,
-            text,
-            sentAt: new Date().toISOString(),
-          };
-          return {
-            ...prev,
-            sentMessagesById: {
-              ...prev.sentMessagesById,
-              [conversationId]: [...existing, message],
-            },
-          };
-        }),
-      getMessages: (conversationId) => [
-        ...(getConversationById(conversationId)?.messages ?? []),
-        ...(state.sentMessagesById[conversationId] ?? []),
-      ],
-      getUnreadCount: (conversationId) =>
-        state.readConversationIds.includes(conversationId)
-          ? 0
-          : (getConversationById(conversationId)?.unreadCount ?? 0),
-      markConversationRead: (conversationId) =>
-        setState((prev) =>
-          prev.readConversationIds.includes(conversationId)
-            ? prev
-            : {
-                ...prev,
-                readConversationIds: [
-                  ...prev.readConversationIds,
-                  conversationId,
-                ],
-              }
-        ),
-      isEventJoined: (eventId) => state.joinedEventIds.includes(eventId),
-      isClubJoined: (clubId) => state.joinedClubIds.includes(clubId),
+      lang,
+      setLang,
+      toggleLang: () => setLang(lang === "en" ? "zh" : "en"),
+      t: (key) => translate(key, lang),
+      tx: (text) => pick(text, lang),
+      authReady,
+      userId,
+      email,
+      profile,
+      profileLoading: Boolean(userId) && profileQuery.isPending,
+      refreshProfile,
     }),
-    [state]
+    [
+      lang,
+      setLang,
+      authReady,
+      userId,
+      email,
+      profile,
+      profileQuery.isPending,
+      refreshProfile,
+    ]
   );
 
-  return (
-    <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>
-  );
+  return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
 }
 
 export function useAppState(): AppStateContextValue {

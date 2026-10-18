@@ -1,15 +1,6 @@
-import { CLUBS } from "@/lib/data/clubs";
 import ClubDetail from "./ClubDetail";
 
-export function generateStaticParams() {
-  return CLUBS.map((club) => ({ id: club.id }));
-}
-
-export default async function ClubDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ClubDetailPage({ params }: PageProps<"/clubs/[id]">) {
   const { id } = await params;
   return <ClubDetail id={id} />;
 }
