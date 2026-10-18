@@ -77,3 +77,14 @@ export function initials(name: string): string {
     .join("")
     .toUpperCase();
 }
+
+/** A member's name in the chosen language; `short` gives just the first name. */
+export function displayName(
+  person: { name: string; nameZh?: string } | undefined,
+  lang: Lang,
+  { short = false }: { short?: boolean } = {}
+): string {
+  if (!person) return "";
+  if (lang === "zh" && person.nameZh) return person.nameZh;
+  return short ? person.name.split(" ")[0] : person.name;
+}

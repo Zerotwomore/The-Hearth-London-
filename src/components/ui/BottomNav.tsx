@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { CONVERSATIONS } from "@/lib/data/conversations";
+import { useMyConversations } from "@/lib/api/chat";
 import { StringKey } from "@/lib/i18n/strings";
 import { ReactNode } from "react";
 
@@ -48,10 +48,11 @@ const TABS: { href: string; key: StringKey; icon: ReactNode }[] = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { t, getUnreadCount } = useAppState();
+  const { t } = useAppState();
+  const { data: conversations } = useMyConversations();
 
-  const unreadTotal = CONVERSATIONS.reduce(
-    (total, conversation) => total + getUnreadCount(conversation.id),
+  const unreadTotal = (conversations ?? []).reduce(
+    (total, conversation) => total + conversation.unreadCount,
     0
   );
 
@@ -87,7 +88,7 @@ export function BottomNav() {
                       aria-label={`${unreadTotal} unread`}
                       className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-pill bg-hearth-ember px-1 text-[10px] font-semibold text-hearth-paper"
                     >
-                      {unreadTotal}
+                      {unreadTotal > 99 ? "99+" : unreadTotal}
                     </span>
                   )}
                 </span>

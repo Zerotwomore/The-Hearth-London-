@@ -92,10 +92,9 @@ select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000001') $$,
   'Joining twice is harmless'
 );
-select throws_ok(
+select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000002') $$,
-  'P0001', 'payment_required',
-  'Paid events cannot be joined without paying'
+  'Paid events can be joined (payment happens at the event)'
 );
 select throws_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000003') $$,
@@ -215,7 +214,7 @@ select is(
 select is(
   (select count(*)::integer from public.event_attendees
    where user_id = '22222222-2222-2222-2222-222222222222'),
-  1,
+  2,
   'Members cannot remove someone else from an event'
 );
 select is(

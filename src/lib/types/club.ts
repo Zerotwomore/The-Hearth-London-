@@ -1,10 +1,12 @@
 import { LocalizedText } from "@/lib/types/i18n";
+import { Profile } from "@/lib/types/user";
 
 export interface ClubPost {
   id: string;
-  authorId: string;
-  content: LocalizedText;
+  /** Written by the member in whatever language they chose — never translated. */
+  body: string;
   createdAt: string;
+  author?: Profile;
 }
 
 export interface Club {
@@ -13,6 +15,10 @@ export interface Club {
   category: LocalizedText;
   imageUrl: string;
   description: LocalizedText;
-  memberIds: string[];
+  /** Empty when signed out — membership lists are only visible to members. */
+  members: Profile[];
+}
+
+export interface ClubDetailItem extends Club {
   posts: ClubPost[];
 }

@@ -10,66 +10,65 @@ import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EventCard } from "@/components/events/EventCard";
 import { ClubCard } from "@/components/clubs/ClubCard";
-import { EVENTS } from "@/lib/data/events";
-import { CLUBS } from "@/lib/data/clubs";
-import { INTERESTS } from "@/lib/data/interests";
+import { SignInPrompt } from "@/components/auth/SignInPrompt";
+import { LoadingState } from "@/components/ui/StatusMessage";
+import { useEvents, useMyEventIds } from "@/lib/api/events";
+import { useClubs, useMyClubIds } from "@/lib/api/clubs";
+import { useInterests } from "@/lib/api/profile";
+import { signOut } from "@/lib/api/auth";
 import { useAppState } from "@/lib/context/AppStateContext";
-
-const PROVIDER_LABEL = {
-  wechat: "providerWechat",
-  apple: "providerApple",
-  email: "providerEmail",
-  guest: "providerGuest",
-} as const;
+import { displayName } from "@/lib/utils";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const {
-    t,
-    tx,
-    profileDraft,
-    authProvider,
-    signOut,
-    joinedEventIds,
-    joinedClubIds,
-    selectedInterestIds,
-  } = useAppState();
+  const { t, tx, lang, userId, email, profile, authReady, profileLoading } = useAppState();
+  const { data: events } = useEvents();
+  const { data: myEventIds } = useMyEventIds();
+  const { data: clubs } = useClubs();
+  const { data: myClubIds } = useMyClubIds();
+  const { data: interests } = useInterests();
 
-  const joinedEvents = EVENTS.filter((event) =>
-    joinedEventIds.includes(event.id)
+  const joinedEvents = (events ?? []).filter((event) => myEventIds?.has(event.id));
+  const joinedClubs = (clubs ?? []).filter((club) => myClubIds?.has(club.id));
+  const myInterests = (interests ?? []).filter((interest) =>
+    profile?.interestIds.includes(interest.id)
   );
-  const joinedClubs = CLUBS.filter((club) => joinedClubIds.includes(club.id));
-  const interests = INTERESTS.filter((interest) =>
-    selectedInterestIds.includes(interest.id)
-  );
+
+  const topBar = <TopBar title={t("profileTitle")} large action={<LanguageToggle />} />;
+
+  if (!authReady || profileLoading) {
+    return (
+      <>
+        {topBar}
+        <LoadingState />
+      </>
+    );
+  }
+  if (!userId || !profile) {
+    return (
+      <>
+        {topBar}
+        <SignInPrompt message="logInForProfile" />
+      </>
+    );
+  }
 
   return (
     <>
-      <TopBar title={t("profileTitle")} large action={<LanguageToggle />} />
+      {topBar}
 
       <div className="px-5 pt-6 pb-24">
         <div className="flex items-center gap-4">
-          <Avatar
-            name={profileDraft.name}
-            src={profileDraft.avatarUrl}
-            size="lg"
-          />
+          <Avatar name={profile.name} src={profile.avatarUrl} size="lg" />
           <div className="min-w-0 flex-1">
             <h2 className="display flex flex-wrap items-center gap-1.5 text-[22px] text-hearth-ink">
-              {profileDraft.name}
-              {profileDraft.verified && <VerifiedBadge size="md" />}
+              {displayName(profile, lang)}
+              {profile.verified && <VerifiedBadge size="md" />}
             </h2>
-            {authProvider && (
-              <p className="mt-1 text-[12px] text-hearth-charcoal-soft">
-                {t("signedInWith")}:{" "}
-                <span className="font-medium text-hearth-ink">
-                  {t(PROVIDER_LABEL[authProvider])}
-                </span>
-              </p>
-            )}
-            {profileDraft.bio && (
+            {email && <p className="mt-1 truncate text-[12px] text-hearth-charcoal-soft">{email}</p>}
+            {profile.bio && (
               <p className="mt-1 text-[13px] leading-relaxed text-hearth-charcoal-soft">
-                {profileDraft.bio}
+                {profile.bio}
               </p>
             )}
           </div>
@@ -77,20 +76,12 @@ export default function ProfilePage() {
 
         <div className="mt-5 flex gap-8 border-y border-hearth-ink/10 py-3.5">
           <div>
-            <p className="display text-[22px] text-hearth-ink">
-              {joinedEventIds.length}
-            </p>
-            <p className="eyebrow text-hearth-charcoal-soft">
-              {t("eventsJoined")}
-            </p>
+            <p className="display text-[22px] text-hearth-ink">{myEventIds?.size ?? 0}</p>
+            <p className="eyebrow text-hearth-charcoal-soft">{t("eventsJoined")}</p>
           </div>
           <div>
-            <p className="display text-[22px] text-hearth-ink">
-              {joinedClubIds.length}
-            </p>
-            <p className="eyebrow text-hearth-charcoal-soft">
-              {t("clubsJoined")}
-            </p>
+            <p className="display text-[22px] text-hearth-ink">{myClubIds?.size ?? 0}</p>
+            <p className="eyebrow text-hearth-charcoal-soft">{t("clubsJoined")}</p>
           </div>
           <div className="ml-auto self-center">
             <Link href="/onboarding">
@@ -101,11 +92,11 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {interests.length > 0 && (
+        {myInterests.length > 0 && (
           <section className="pt-6">
             <SectionHeader title={t("yourInterests")} />
             <div className="flex flex-wrap gap-2">
-              {interests.map((interest) => (
+              {myInterests.map((interest) => (
                 <span
                   key={interest.id}
                   className="rounded-pill border border-hearth-ink/12 bg-hearth-paper px-3.5 py-1.5 text-[13px] text-hearth-charcoal"
@@ -124,13 +115,11 @@ export default function ProfilePage() {
             actionHref="/events"
           />
           {joinedEvents.length === 0 ? (
-            <p className="text-[14px] text-hearth-charcoal-soft">
-              {t("noJoinedEvents")}
-            </p>
+            <p className="text-[14px] text-hearth-charcoal-soft">{t("noJoinedEvents")}</p>
           ) : (
             <div className="grid grid-cols-2 gap-x-4 gap-y-7">
               {joinedEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard key={event.id} event={event} joined />
               ))}
             </div>
           )}
@@ -143,13 +132,11 @@ export default function ProfilePage() {
             actionHref="/clubs"
           />
           {joinedClubs.length === 0 ? (
-            <p className="text-[14px] text-hearth-charcoal-soft">
-              {t("noJoinedClubs")}
-            </p>
+            <p className="text-[14px] text-hearth-charcoal-soft">{t("noJoinedClubs")}</p>
           ) : (
             <div className="space-y-6">
               {joinedClubs.map((club) => (
-                <ClubCard key={club.id} club={club} />
+                <ClubCard key={club.id} club={club} joined />
               ))}
             </div>
           )}
@@ -159,8 +146,8 @@ export default function ProfilePage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              signOut();
+            onClick={async () => {
+              await signOut();
               router.push("/onboarding");
             }}
           >
