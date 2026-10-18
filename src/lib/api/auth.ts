@@ -18,7 +18,7 @@ export async function signUp(email: string, password: string): Promise<boolean> 
   const { data, error } = await supabase().auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: siteUrl("/onboarding") },
+    options: { emailRedirectTo: siteUrl("/onboarding/") },
   });
   if (error) throw error;
   return Boolean(data.session);
@@ -28,7 +28,7 @@ export async function resendConfirmation(email: string): Promise<void> {
   const { error } = await supabase().auth.resend({
     type: "signup",
     email,
-    options: { emailRedirectTo: siteUrl("/onboarding") },
+    options: { emailRedirectTo: siteUrl("/onboarding/") },
   });
   if (error) throw error;
 }
@@ -40,7 +40,7 @@ export async function signIn(email: string, password: string): Promise<void> {
 
 export async function sendPasswordReset(email: string): Promise<void> {
   const { error } = await supabase().auth.resetPasswordForEmail(email, {
-    redirectTo: siteUrl("/reset-password"),
+    redirectTo: siteUrl("/reset-password/"),
   });
   if (error) throw error;
 }

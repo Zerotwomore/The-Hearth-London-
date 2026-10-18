@@ -3,7 +3,7 @@
 Bilingual (EN / 中文) app for meeting people in London over events, clubs and
 event group chats. Live at [thehearthlondon.com](https://thehearthlondon.com).
 
-- **App:** Next.js in `src/`, hosted on Vercel.
+- **App:** Next.js in `src/`, built as static files and hosted on GitHub Pages.
 - **Backend:** Supabase (Postgres, Auth, Storage, Realtime) in `supabase/` —
   schema, security rules and tests. See [supabase/README.md](supabase/README.md).
 
@@ -29,7 +29,13 @@ npx supabase test db          # backend security tests (local Supabase)
 
 ## Deploying
 
-Pushing to `main` deploys to Vercel. The two `NEXT_PUBLIC_SUPABASE_*` variables
-must be set in Vercel → Project → Settings → Environment Variables. Database
-changes are new files in `supabase/migrations/`, applied with
-`npx supabase db push`.
+Pushing to `main` builds the site and publishes it to GitHub Pages
+(`.github/workflows/deploy.yml`, which also holds the two public Supabase
+values). Database changes are new files in `supabase/migrations/`, applied
+with `npx supabase db push` (or pasted into the SQL editor and recorded in
+`supabase_migrations.schema_migrations`).
+
+Because the site is static, event, club and chat pages use `?id=` links
+(`src/lib/routes.ts`) and shared links get the general site preview. Moving
+to a server host such as Vercel would allow `/events/<id>` links and
+per-event previews.

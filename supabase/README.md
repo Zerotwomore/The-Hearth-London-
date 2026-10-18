@@ -84,7 +84,7 @@ runs every migration and test against a real Supabase stack on each push.
    to `/onboarding` and `/reset-password`):
    - `https://thehearthlondon.com/**`
    - `http://localhost:3000/**`
-   - your Vercel preview pattern, e.g. `https://the-hearth-london-*-<team>.vercel.app/**`
+   - if you later add Vercel previews, their pattern, e.g. `https://the-hearth-london-*-<team>.vercel.app/**`
      (never a bare `https://*.vercel.app/**`, which would let any Vercel site
      receive sign-in links)
 4. **Email sender** — Supabase's built-in sender only reaches your own team.
@@ -104,8 +104,8 @@ runs every migration and test against a real Supabase stack on each push.
    select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');
    select vault.create_secret('<the same random string>', 'cron_secret');
    ```
-6. **Vercel environment variables** (Project → Settings → Environment
-   Variables): `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   from Supabase → Project Settings → API. These are safe in the browser. The
-   **service role key must never go into Vercel or the app.**
+6. **App settings:** `NEXT_PUBLIC_SUPABASE_URL` and
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` from Supabase → Project Settings → API go in
+   `.github/workflows/deploy.yml` (and `.env.local` locally). They are safe in
+   the browser. The **service role key must never go into the app or the repo.**
 7. Check **Advisors → Security** in the dashboard shows no errors.

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { EventItem } from "@/lib/types/event";
+import { eventHref } from "@/lib/routes";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { useCategories } from "@/lib/api/events";
 import { formatEventDateTime } from "@/lib/utils";
@@ -13,7 +14,7 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
   const category = categories?.find((item) => item.id === event.categoryId);
 
   return (
-    <Link href={`/events/${event.id}`} className="group block">
+    <Link href={eventHref(event.id)} className="group block">
       <article className="flex flex-col">
         <div className="relative aspect-[3/4] overflow-hidden rounded-[6px] frame bg-hearth-cream-dark">
           {/* eslint-disable-next-line @next/next/no-img-element */}

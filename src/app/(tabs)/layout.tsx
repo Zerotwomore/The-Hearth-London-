@@ -9,7 +9,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const router = useRouter();
   const { profile } = useAppState();
-  const inConversation = /^\/chat\/[^/]+$/.test(pathname);
+  const inConversation = pathname.startsWith("/chat/view");
 
   // Members finish onboarding (name, interests) before using the app.
   useEffect(() => {

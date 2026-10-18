@@ -2,7 +2,8 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Both values are public: the anon key only grants what the database's row
- * level security allows. Set them in Vercel (and .env.local for `next dev`).
+ * level security allows. Set in .github/workflows/deploy.yml for the live
+ * site, and in .env.local for `next dev`.
  * The service role key must never be used here.
  */
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -31,14 +32,6 @@ export function supabase(): SupabaseClient {
     },
   });
   return browserClient;
-}
-
-/** A signed-out client for server code, such as building link previews. */
-export function serverSupabase(): SupabaseClient | null {
-  if (!isSupabaseConfigured) return null;
-  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
 }
 
 /** Public URL of a file in a public bucket (avatars, event-media). */

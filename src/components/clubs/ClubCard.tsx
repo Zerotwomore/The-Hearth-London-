@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Club } from "@/lib/types/club";
+import { clubHref } from "@/lib/routes";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { AttendeeAvatarStack } from "@/components/events/AttendeeAvatarStack";
 
@@ -9,7 +10,7 @@ export function ClubCard({ club, joined = false }: { club: Club; joined?: boolea
   const { tx, t } = useAppState();
 
   return (
-    <Link href={`/clubs/${club.id}`} className="group block">
+    <Link href={clubHref(club.id)} className="group block">
       <article className="flex gap-4">
         <div className="relative h-28 w-22 shrink-0 overflow-hidden rounded-[5px] frame bg-hearth-cream-dark">
           {/* eslint-disable-next-line @next/next/no-img-element */}
