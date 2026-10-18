@@ -5,6 +5,7 @@ import { useClub, useMyClubIds, useToggleClub } from "@/lib/api/clubs";
 import { errorKey } from "@/lib/api/errors";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { displayName } from "@/lib/utils";
+import { clubHref, loginHref } from "@/lib/routes";
 import { TopBar } from "@/components/ui/TopBar";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
@@ -77,7 +78,7 @@ export default function ClubDetail({ id }: { id: string }) {
                 )}
               </div>
             ) : (
-              <Link href={`/login?next=/clubs/${club.id}`} className="block">
+              <Link href={loginHref(clubHref(club.id))} className="block">
                 <Button size="md" fullWidth>
                   {t("logInToJoinClub")}
                 </Button>

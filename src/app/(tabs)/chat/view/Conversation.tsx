@@ -11,6 +11,7 @@ import {
 import { errorKey } from "@/lib/api/errors";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { cn, displayName, formatMessageTime } from "@/lib/utils";
+import { eventHref } from "@/lib/routes";
 import { TopBar } from "@/components/ui/TopBar";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
@@ -84,7 +85,7 @@ export default function Conversation({ id }: { id: string }) {
         backHref="/chat"
         action={
           <Link
-            href={`/events/${event.id}`}
+            href={eventHref(event.id)}
             className="h-9 w-9 shrink-0 overflow-hidden rounded-[5px] border-2 border-hearth-gold"
             aria-label={t("viewEvent")}
           >
@@ -95,7 +96,7 @@ export default function Conversation({ id }: { id: string }) {
       />
 
       <Link
-        href={`/events/${event.id}`}
+        href={eventHref(event.id)}
         className="flex items-center justify-between gap-3 border-b border-hearth-ink/10 bg-hearth-cream-dark/50 px-5 py-2.5 hover:bg-hearth-cream-dark"
       >
         <span className="min-w-0 truncate text-[13px] text-hearth-charcoal">

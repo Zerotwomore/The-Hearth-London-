@@ -5,6 +5,7 @@ import { useEvent, useCategories, useMyEventIds } from "@/lib/api/events";
 import { useEventConversationId } from "@/lib/api/chat";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { displayName, formatFullDate, formatTimeRange } from "@/lib/utils";
+import { chatHref } from "@/lib/routes";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { JoinButton } from "@/components/events/JoinButton";
@@ -169,7 +170,7 @@ export default function EventDetail({ id }: { id: string }) {
         <JoinButton event={event} joined={joined} />
         {conversationId ? (
           <Link
-            href={`/chat/${conversationId}`}
+            href={chatHref(conversationId)}
             className="mt-2 block text-center text-[13px] text-hearth-charcoal-soft hover:text-hearth-ember"
           >
             {t("openGroupChat")} →

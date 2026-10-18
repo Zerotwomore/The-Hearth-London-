@@ -6,6 +6,7 @@ import { useAppState } from "@/lib/context/AppStateContext";
 import { useJoinEvent, useLeaveEvent } from "@/lib/api/events";
 import { errorKey } from "@/lib/api/errors";
 import { EventItem } from "@/lib/types/event";
+import { eventHref, loginHref } from "@/lib/routes";
 
 interface JoinButtonProps {
   event: EventItem;
@@ -25,7 +26,7 @@ export function JoinButton({ event, joined }: JoinButtonProps) {
   let button;
   if (!userId) {
     button = (
-      <Link href={`/login?next=/events/${event.id}`} className="block">
+      <Link href={loginHref(eventHref(event.id))} className="block">
         <Button size="lg" fullWidth>
           {t("logInToJoin")}
         </Button>

@@ -8,6 +8,7 @@ import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusM
 import { useMyConversations } from "@/lib/api/chat";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { formatMessageTime } from "@/lib/utils";
+import { chatHref } from "@/lib/routes";
 
 export default function ChatListPage() {
   const { t, tx, lang, userId, authReady } = useAppState();
@@ -42,7 +43,7 @@ export default function ChatListPage() {
             return (
               <li key={conversation.id}>
                 <Link
-                  href={`/chat/${conversation.id}`}
+                  href={chatHref(conversation.id)}
                   className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-hearth-cream-dark/40"
                 >
                   <span className="h-12 w-12 shrink-0 overflow-hidden rounded-[6px] border-2 border-hearth-gold bg-hearth-cream-dark">
