@@ -24,8 +24,4 @@ export interface EventItem {
   description: LocalizedText;
   highlights: LocalizedText[];
   price: LocalizedText;
-  /** Members-only event — requires a Hearth VIP membership to join. */
-  vipOnly?: boolean;
-  /** Shown to VIP members as their reduced price. */
-  vipPrice?: LocalizedText;
 }

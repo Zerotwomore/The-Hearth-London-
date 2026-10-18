@@ -108,62 +108,6 @@ export const STRINGS = {
   noAccount: { en: "New here?", zh: "第一次来？" },
   hasAccount: { en: "Already a member?", zh: "已经是会员？" },
 
-  // VIP
-  vip: { en: "VIP", zh: "VIP" },
-  vipTitle: { en: "Hearth VIP", zh: "Hearth VIP 会员" },
-  vipTagline: {
-    en: "A quieter room, a better seat.",
-    zh: "更安静的房间，更好的位置。",
-  },
-  vipIntro: {
-    en: "Membership for people who come often — priority booking on the tours that sell out, members-only evenings, and a standing discount on every ticket.",
-    zh: "为常来的人准备的会员计划 —— 热门导览优先预订、专属会员之夜，以及全场活动长期折扣。",
-  },
-  vipPerkPriority: {
-    en: "Priority booking, 48 hours before general release",
-    zh: "提前 48 小时优先预订",
-  },
-  vipPerkExclusive: {
-    en: "Members-only evenings — small groups, after-hours galleries",
-    zh: "专属会员之夜 —— 小团出行、闭馆后的美术馆",
-  },
-  vipPerkDiscount: {
-    en: "20% off every ticket, including guest places",
-    zh: "全场活动 8 折，携伴同享",
-  },
-  vipPerkHost: {
-    en: "Bring a guest to any members-only event",
-    zh: "可携伴参加任意会员专属活动",
-  },
-  vipPerkFantuan: {
-    en: "Complimentary Fantuan membership — free delivery and partner offers",
-    zh: "赠送饭团会员 —— 免配送费及合作商家优惠",
-  },
-  vipPartners: { en: "Partner benefits", zh: "合作权益" },
-  vipPrice: { en: "£12 / month", zh: "£12 / 月" },
-  vipCancel: { en: "Cancel anytime", zh: "随时可取消" },
-  vipJoin: { en: "Become a VIP member", zh: "成为 VIP 会员" },
-  vipActive: { en: "VIP member", zh: "VIP 会员" },
-  vipSince: { en: "Member since", zh: "加入时间" },
-  vipManage: { en: "Manage membership", zh: "管理会员" },
-  vipLeave: { en: "End membership", zh: "结束会员" },
-  vipMockNote: {
-    en: "Prototype — no payment is taken",
-    zh: "原型演示 —— 不会产生任何付款",
-  },
-  vipOnlyEvent: { en: "Members only", zh: "会员专属" },
-  vipOnlyLocked: {
-    en: "This evening is for VIP members.",
-    zh: "本场活动仅限 VIP 会员参加。",
-  },
-  vipUnlock: { en: "Unlock with VIP", zh: "开通 VIP 参加" },
-  vipSaving: { en: "VIP price", zh: "会员价" },
-  vipUpsell: {
-    en: "VIP members pay less and book first.",
-    zh: "VIP 会员享折扣与优先预订。",
-  },
-  vipSeeBenefits: { en: "See benefits", zh: "查看权益" },
-
   // SSO
   continueWithWechat: { en: "Continue with WeChat", zh: "微信登录" },
   continueWithApple: { en: "Continue with Apple", zh: "通过 Apple 登录" },

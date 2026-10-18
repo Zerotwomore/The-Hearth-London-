@@ -46,7 +46,6 @@ export const EVENTS: EventItem[] = [
       },
     ],
     price: { en: "£20 per person", zh: "£20/人" },
-    vipPrice: { en: "£16 per person", zh: "£16/人" },
   },
   {
     id: "e2",
@@ -84,7 +83,6 @@ export const EVENTS: EventItem[] = [
       },
     ],
     price: { en: "£9.90 per person", zh: "£9.9/人" },
-    vipPrice: { en: "£7.90 per person", zh: "£7.9/人" },
   },
   {
     id: "e3",
@@ -257,8 +255,6 @@ export const EVENTS: EventItem[] = [
       { en: "A drink in the armoury afterwards", zh: "结束后于军械厅小酌" },
     ],
     price: { en: "£38 per person", zh: "£38/人" },
-    vipPrice: { en: "£30 per person", zh: "£30/人" },
-    vipOnly: true,
   },
   {
     id: "e9",
@@ -296,8 +292,6 @@ export const EVENTS: EventItem[] = [
       },
     ],
     price: { en: "£85 per person", zh: "£85/人" },
-    vipPrice: { en: "£68 per person", zh: "£68/人" },
-    vipOnly: true,
   },
   {
     id: "e10",
@@ -329,8 +323,6 @@ export const EVENTS: EventItem[] = [
       { en: "Members only, eight places", zh: "仅限会员，八个名额" },
     ],
     price: { en: "£95 per person", zh: "£95/人" },
-    vipPrice: { en: "£76 per person", zh: "£76/人" },
-    vipOnly: true,
   },
 ];
 
