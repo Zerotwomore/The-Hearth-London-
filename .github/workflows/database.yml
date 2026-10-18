@@ -1,0 +1,34 @@
+name: Database tests
+
+# Runs the migrations, seed and security tests against a real local Supabase
+# stack (Postgres, Auth, Storage) on every change to the backend.
+on:
+  push:
+    branches: [main]
+    paths: ["supabase/**", ".github/workflows/database.yml"]
+  pull_request:
+    paths: ["supabase/**", ".github/workflows/database.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Only the database is needed; this also applies migrations and seed.sql.
+      - name: Start Postgres
+        run: supabase db start
+
+      - name: Run security tests
+        run: supabase test db
+
+      - name: Lint database functions
+        run: supabase db lint --level warning --fail-on error

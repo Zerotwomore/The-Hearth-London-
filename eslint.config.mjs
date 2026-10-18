@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Edge Functions are Deno code with their own tooling.
+    "supabase/functions/**",
   ]),
 ]);
 
