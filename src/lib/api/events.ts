@@ -3,8 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/api/supabase";
 import {
-  EVENT_FIELDS,
   EventRow,
+  eventFields,
   PROFILE_FIELDS,
   ProfileRow,
   isUuid,
@@ -44,7 +44,7 @@ export function useEvents() {
     queryFn: async (): Promise<EventItem[]> => {
       const { data, error } = await supabase()
         .from("events")
-        .select(EVENT_FIELDS)
+        .select(eventFields(Boolean(userId)))
         .gte("starts_at", new Date().toISOString())
         .order("starts_at");
       if (error) throw error;
@@ -60,14 +60,17 @@ export function useEvent(id: string) {
     queryKey: ["event", id, userId],
     queryFn: async (): Promise<EventDetailItem | null> => {
       if (!isUuid(id)) return null;
+      const fields = userId
+        ? `${eventFields(true)}, host:profiles!events_host_id_fkey ( ${PROFILE_FIELDS} )`
+        : eventFields(false);
       const { data, error } = await supabase()
         .from("events")
-        .select(`${EVENT_FIELDS}, host:profiles!events_host_id_fkey ( ${PROFILE_FIELDS} )`)
+        .select(fields)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
       if (!data) return null;
-      const row = data as unknown as EventRow & { host: ProfileRow | null };
+      const row = data as unknown as EventRow & { host?: ProfileRow | null };
       return { ...toEvent(row), host: row.host ? toProfile(row.host) : undefined };
     },
   });

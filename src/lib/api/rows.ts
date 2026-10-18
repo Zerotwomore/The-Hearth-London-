@@ -40,12 +40,21 @@ export function toProfiles(rows: { profiles: ProfileRow | null }[] | null): Prof
 
 // Events ---------------------------------------------------------------------
 
-export const EVENT_FIELDS = `
+const PUBLIC_EVENT_FIELDS = `
   id, title, category_id, poster_url, gallery_urls, starts_at, ends_at,
   location_name, location_area, host_id, capacity, description, highlights,
-  price_pence, price_label,
-  event_attendees ( joined_at, profiles ( ${PROFILE_FIELDS} ) )
+  price_pence, price_label
 `;
+
+/**
+ * Columns to load for an event. Attendees and profiles are members-only: the
+ * database refuses the whole query if a signed-out visitor asks for them.
+ */
+export function eventFields(signedIn: boolean): string {
+  return signedIn
+    ? `${PUBLIC_EVENT_FIELDS}, event_attendees ( joined_at, profiles ( ${PROFILE_FIELDS} ) )`
+    : PUBLIC_EVENT_FIELDS;
+}
 
 export interface EventRow {
   id: string;
@@ -63,7 +72,8 @@ export interface EventRow {
   highlights: LocalizedText[];
   price_pence: number;
   price_label: LocalizedText | null;
-  event_attendees: { joined_at: string; profiles: ProfileRow | null }[] | null;
+  /** Absent when loaded signed out. */
+  event_attendees?: { joined_at: string; profiles: ProfileRow | null }[] | null;
 }
 
 function formatPounds(pence: number): string {

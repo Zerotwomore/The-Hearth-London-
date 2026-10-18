@@ -7,10 +7,15 @@ import { useAppState } from "@/lib/context/AppStateContext";
 import { Club, ClubDetailItem } from "@/lib/types/club";
 import { LocalizedText } from "@/lib/types/i18n";
 
-const CLUB_FIELDS = `
-  id, name, category, image_url, description,
-  club_members ( joined_at, profiles ( ${PROFILE_FIELDS} ) )
-`;
+const PUBLIC_CLUB_FIELDS = "id, name, category, image_url, description";
+
+/** Members and posts are members-only; signed-out queries must not ask for them. */
+function clubFields(signedIn: boolean, withPosts = false): string {
+  if (!signedIn) return PUBLIC_CLUB_FIELDS;
+  const members = `club_members ( joined_at, profiles ( ${PROFILE_FIELDS} ) )`;
+  const posts = `club_posts ( id, body, created_at, profiles ( ${PROFILE_FIELDS} ) )`;
+  return [PUBLIC_CLUB_FIELDS, members, ...(withPosts ? [posts] : [])].join(", ");
+}
 
 interface ClubRow {
   id: string;
@@ -18,7 +23,8 @@ interface ClubRow {
   category: LocalizedText;
   image_url: string;
   description: LocalizedText;
-  club_members: { joined_at: string; profiles: ProfileRow | null }[] | null;
+  /** Absent when loaded signed out. */
+  club_members?: { joined_at: string; profiles: ProfileRow | null }[] | null;
 }
 
 interface ClubPostRow {
@@ -49,7 +55,7 @@ export function useClubs() {
     queryFn: async (): Promise<Club[]> => {
       const { data, error } = await supabase()
         .from("clubs")
-        .select(CLUB_FIELDS)
+        .select(clubFields(Boolean(userId)))
         .order("created_at");
       if (error) throw error;
       return (data as unknown as ClubRow[]).map(toClub);
@@ -64,17 +70,17 @@ export function useClub(id: string) {
     queryKey: ["club", id, userId],
     queryFn: async (): Promise<ClubDetailItem | null> => {
       if (!isUuid(id)) return null;
-      const { data, error } = await supabase()
+      let query = supabase()
         .from("clubs")
-        .select(
-          `${CLUB_FIELDS}, club_posts ( id, body, created_at, profiles ( ${PROFILE_FIELDS} ) )`
-        )
-        .eq("id", id)
-        .order("created_at", { referencedTable: "club_posts", ascending: false })
-        .maybeSingle();
+        .select(clubFields(Boolean(userId), true))
+        .eq("id", id);
+      if (userId) {
+        query = query.order("created_at", { referencedTable: "club_posts", ascending: false });
+      }
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       if (!data) return null;
-      const row = data as unknown as ClubRow & { club_posts: ClubPostRow[] | null };
+      const row = data as unknown as ClubRow & { club_posts?: ClubPostRow[] | null };
       return {
         ...toClub(row),
         posts: (row.club_posts ?? []).map((post) => ({
