@@ -21,6 +21,7 @@ export const STRINGS = {
   errorSignInRequired: { en: "Please log in first.", zh: "请先登录。" },
   errorEventFull: { en: "Sorry — this event is full.", zh: "抱歉，活动名额已满。" },
   errorEventStarted: { en: "This event has already started.", zh: "活动已经开始。" },
+  errorEventEnded: { en: "This event has already ended.", zh: "活动已经结束。" },
   errorRequestDeclined: {
     en: "The host declined your request for this event.",
     zh: "主办人未通过你的报名申请。",
@@ -146,6 +147,26 @@ export const STRINGS = {
   // Review status
   statusPending: { en: "Awaiting approval", zh: "待审核" },
   statusRejected: { en: "Not approved", zh: "未通过" },
+  statusCancelled: { en: "Cancelled", zh: "已取消" },
+  statusEnded: { en: "Ended", zh: "已结束" },
+  cancelledNotice: {
+    en: "The host cancelled this event. The group chat stays open.",
+    zh: "主办人已取消本次活动，活动群聊仍可使用。",
+  },
+  manageEvent: { en: "Manage event", zh: "管理活动" },
+  cancelEvent: { en: "Cancel event", zh: "取消活动" },
+  deleteEvent: { en: "Delete event", zh: "删除活动" },
+  confirmCancelEvent: {
+    en: "Cancel this event? It will be hidden from What's on and nobody can join. Attendees will see it as cancelled and can still use the group chat.",
+    zh: "确定取消活动？活动将不再公开展示，也无法报名。参与者会看到活动已取消，群聊仍可使用。",
+  },
+  confirmDeleteEvent: {
+    en: "Delete this event permanently? The attendee list and group chat will be deleted too. This can't be undone.",
+    zh: "确定永久删除活动？参与名单和群聊也会一并删除，且无法恢复。",
+  },
+  keepEvent: { en: "Keep event", zh: "保留活动" },
+  yesCancel: { en: "Yes, cancel it", zh: "确定取消" },
+  yesDelete: { en: "Yes, delete it", zh: "确定删除" },
   pendingNotice: {
     en: "This event is waiting for approval. Only you and the admins can see it.",
     zh: "活动正在等待审核，目前只有你和管理员可以看到。",

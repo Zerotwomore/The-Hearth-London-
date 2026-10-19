@@ -17,7 +17,7 @@ import { useClubs, useMyClubIds } from "@/lib/api/clubs";
 import { useInterests } from "@/lib/api/profile";
 import { signOut } from "@/lib/api/auth";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { displayName } from "@/lib/utils";
+import { displayName, hasEnded } from "@/lib/utils";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function ProfilePage() {
 
   // Hosted events have their own section.
   const joinedEvents = (events ?? []).filter(
-    (event) => myEventIds?.has(event.id) && event.hostId !== userId
+    (event) => myEventIds?.has(event.id) && event.hostId !== userId && !hasEnded(event)
   );
   const joinedClubs = (clubs ?? []).filter((club) => myClubIds?.has(club.id));
   const myInterests = (interests ?? []).filter((interest) =>

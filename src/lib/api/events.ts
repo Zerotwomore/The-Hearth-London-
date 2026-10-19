@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/rows";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { imageExtension, resizeImage } from "@/lib/api/images";
+import { hasEnded } from "@/lib/utils";
 import {
   EventCategory,
   EventDetailItem,
@@ -44,7 +45,10 @@ export function useCategories() {
   });
 }
 
-/** Upcoming events, soonest first. */
+/**
+ * Upcoming events soonest first, then ended ones, most recent first. Ended
+ * events stay listed (greyed out) until their host deletes them.
+ */
 export function useEvents() {
   const { userId } = useAppState();
   return useQuery({
@@ -53,11 +57,12 @@ export function useEvents() {
       const { data, error } = await supabase()
         .from("events")
         .select(eventFields(Boolean(userId)))
-        .eq("status", "approved")
-        .gte("starts_at", new Date().toISOString())
+        // The database only returns cancelled events to their host and
+        // attendees; the listing hides them, the profile labels them.
+        .in("status", ["approved", "cancelled"])
         .order("starts_at");
       if (error) throw error;
-      return (data as unknown as EventRow[]).map(toEvent);
+      return byUpcomingThenEnded((data as unknown as EventRow[]).map(toEvent));
     },
   });
 }
@@ -243,22 +248,20 @@ export function useRespondToJoinRequest(eventId: string) {
 /** Matches create_event(): pending or approved events that haven't ended yet. */
 export const MAX_ACTIVE_EVENTS = 20;
 
-/** Events the member hosts that haven't ended, in any review state, soonest first. */
+/** Every event the member hosts, in any state: upcoming soonest first, then ended ones. */
 export function useHostedEvents() {
   const { userId } = useAppState();
   return useQuery({
     queryKey: ["hosted-events", userId],
     enabled: Boolean(userId),
     queryFn: async (): Promise<EventItem[]> => {
-      const now = new Date().toISOString();
       const { data, error } = await supabase()
         .from("events")
         .select(eventFields(true))
         .eq("host_id", userId!)
-        .or(`ends_at.gt.${now},and(ends_at.is.null,starts_at.gt.${now})`)
         .order("starts_at");
       if (error) throw error;
-      return (data as unknown as EventRow[]).map(toEvent);
+      return byUpcomingThenEnded((data as unknown as EventRow[]).map(toEvent));
     },
   });
 }
@@ -348,4 +351,48 @@ export function useReviewEvent() {
         queryClient.invalidateQueries({ queryKey: ["pending-events"] }),
       ]),
   });
+}
+
+/** For the host: marks the event cancelled. Attendees keep it and its chat. */
+export function useCancelEvent() {
+  const invalidate = useInvalidateEvents();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const { error } = await supabase().rpc("cancel_event", { p_event_id: eventId });
+      if (error) throw error;
+    },
+    onSettled: (_data, _error, eventId) =>
+      Promise.all([
+        invalidate(eventId),
+        queryClient.invalidateQueries({ queryKey: ["hosted-events"] }),
+      ]),
+  });
+}
+
+/** For the host: permanently removes the event, its attendees and its chat. */
+export function useDeleteEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const { error } = await supabase().rpc("delete_event", { p_event_id: eventId });
+      if (error) throw error;
+    },
+    onSuccess: (_data, eventId) =>
+      queryClient.removeQueries({ queryKey: ["event", eventId] }),
+    onSettled: () =>
+      Promise.all(
+        ["events", "hosted-events", "my-event-ids", "conversations", "pending-events"].map(
+          (key) => queryClient.invalidateQueries({ queryKey: [key] })
+        )
+      ),
+  });
+}
+
+function byUpcomingThenEnded(events: EventItem[]): EventItem[] {
+  const endTime = (event: EventItem) => new Date(event.endsAt ?? event.startsAt).getTime();
+  const upcoming = events.filter((event) => !hasEnded(event));
+  const ended = events.filter(hasEnded).sort((a, b) => endTime(b) - endTime(a));
+  // Rows arrive ordered by start time, so the upcoming ones are already sorted.
+  return [...upcoming, ...ended];
 }

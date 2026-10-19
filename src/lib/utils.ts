@@ -88,3 +88,8 @@ export function displayName(
   if (lang === "zh" && person.nameZh) return person.nameZh;
   return short ? person.name.split(" ")[0] : person.name;
 }
+
+/** True once an event is over: its end time, or its start if it has none, has passed. */
+export function hasEnded(event: { startsAt: string; endsAt?: string }): boolean {
+  return new Date(event.endsAt ?? event.startsAt).getTime() <= Date.now();
+}

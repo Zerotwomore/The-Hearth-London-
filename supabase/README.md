@@ -19,10 +19,10 @@ supabase/
 | Area | Tables | Key rules |
 |---|---|---|
 | People | `profiles`, `profile_interests`, `contact_details` | Anyone signed in can read profiles; only you can edit yours, and never `verified`. Your WeChat ID is only visible to people who share an event with you. |
-| Events | `events`, `event_attendees` | Approved events are public (so shared links preview). Members host events through `create_event()` — at most 20 active (pending or approved, not yet ended) per member. Members' events start `pending` and are visible only to the host and admins until an admin approves them with `review_event()`; admins' own events are approved immediately. Joining is a request to the host: `join_event()` records it in `event_join_requests` (checking approval, capacity and start time), and the host answers with `respond_to_join_request()` — accepting adds them to `event_attendees` (re-checking capacity under a row lock); declined members can't ask again. Members can withdraw a pending request. |
+| Events | `events`, `event_attendees` | Approved events are public (so shared links preview). Members host events through `create_event()` — at most 20 active (pending or approved, not yet ended) per member. Members' events start `pending` and are visible only to the host and admins until an admin approves them with `review_event()`; admins' own events are approved immediately. Joining is a request to the host: `join_event()` records it in `event_join_requests` (checking approval, capacity and start time), and the host answers with `respond_to_join_request()` — accepting adds them to `event_attendees` (re-checking capacity under a row lock); declined members can't ask again. Members can withdraw a pending request. Hosts can `cancel_event()` (hidden from listings and closed to joining, but kept — with its chat — for the host and attendees) or `delete_event()` (removes the event, attendees, requests and chat for good). Ended events stay listed, greyed out, until the host deletes them. |
 | Clubs | `clubs`, `club_members`, `club_posts` | Anyone can join; only members can post; authors and club admins can delete posts. |
 | Chat | `conversations`, `messages`, `conversation_reads` | One group chat per event, created automatically. Only the host and attendees can read or post; it becomes read-only 7 days after the event. 20 messages/minute, 20 images/day. |
-| Storage | buckets `avatars`, `event-media`, `chat-media` | Size and type caps enforced by Storage. Hosts upload posters to `event-media/<their id>/`, 20 a day. Chat images are private, 40 uploads/day, and deleted 30 days after the event. |
+| Storage | buckets `avatars`, `event-media`, `chat-media` | Size and type caps enforced by Storage. Hosts upload posters to `event-media/<their id>/`, 20 a day. Chat images are private, 40 uploads/day, and deleted 30 days after the event, or at the next daily cleanup once the event is deleted. |
 
 Clubs are created by staff in the Supabase dashboard for now.
 
@@ -77,7 +77,7 @@ runs every migration and test against a real Supabase stack on each push.
   old one in a later migration.
 - **Error codes** raised for the app — `event_full`, `event_started`,
   `event_limit_reached`, `event_in_past`, `invalid_event`, `not_allowed`,
-  `request_declined`, `request_not_found`,
+  `request_declined`, `request_not_found`, `event_ended`,
   `event_not_found`, `not_authenticated`,
   `rate_limited`, `image_limit_reached`, `conversation_not_found` — are part
   of the contract; the app maps them to user-facing text.
