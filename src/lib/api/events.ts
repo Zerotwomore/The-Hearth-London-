@@ -13,7 +13,14 @@ import {
 } from "@/lib/api/rows";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { imageExtension, resizeImage } from "@/lib/api/images";
-import { EventCategory, EventDetailItem, EventItem, NewEvent } from "@/lib/types/event";
+import {
+  EventCategory,
+  EventDetailItem,
+  EventItem,
+  JoinRequest,
+  JoinRequestStatus,
+  NewEvent,
+} from "@/lib/types/event";
 import { LocalizedText } from "@/lib/types/i18n";
 
 // Queries are keyed on the signed-in user: signed-out visitors see less
@@ -107,12 +114,37 @@ function useInvalidateEvents() {
       queryClient.invalidateQueries({ queryKey: ["event", eventId] }),
       queryClient.invalidateQueries({ queryKey: ["my-event-ids"] }),
       queryClient.invalidateQueries({ queryKey: ["conversations"] }),
+      queryClient.invalidateQueries({ queryKey: ["my-join-requests"] }),
+      queryClient.invalidateQueries({ queryKey: ["join-requests", eventId] }),
     ]);
 }
 
+/** The signed-in member's join requests still waiting on, or declined by, the host. */
+export function useMyJoinRequests() {
+  const { userId } = useAppState();
+  return useQuery({
+    queryKey: ["my-join-requests", userId],
+    enabled: Boolean(userId),
+    queryFn: async (): Promise<Map<string, JoinRequestStatus>> => {
+      const { data, error } = await supabase()
+        .from("event_join_requests")
+        .select("event_id, status")
+        .eq("user_id", userId!);
+      if (error) throw error;
+      return new Map(
+        (data as { event_id: string; status: JoinRequestStatus }[]).map((row) => [
+          row.event_id,
+          row.status,
+        ])
+      );
+    },
+  });
+}
+
 /**
- * Joins through the database's join_event(), which checks capacity and start
- * time. Errors carry codes such as "event_full" (see lib/api/errors).
+ * Asks the host for a place through the database's join_event(), which
+ * checks capacity and start time. The member becomes an attendee once the
+ * host accepts. Errors carry codes such as "event_full" (see lib/api/errors).
  */
 export function useJoinEvent() {
   const invalidate = useInvalidateEvents();
@@ -138,6 +170,62 @@ export function useLeaveEvent() {
       if (error) throw error;
     },
     onSettled: (_data, _error, eventId) => invalidate(eventId),
+  });
+}
+
+/** Withdraws a request the host hasn't answered yet. */
+export function useWithdrawJoinRequest() {
+  const { userId } = useAppState();
+  const invalidate = useInvalidateEvents();
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const { error } = await supabase()
+        .from("event_join_requests")
+        .delete()
+        .eq("event_id", eventId)
+        .eq("user_id", userId!)
+        .eq("status", "pending");
+      if (error) throw error;
+    },
+    onSettled: (_data, _error, eventId) => invalidate(eventId),
+  });
+}
+
+/** For the host: people waiting for an answer, oldest request first. */
+export function useJoinRequests(eventId: string, enabled: boolean) {
+  const { userId } = useAppState();
+  return useQuery({
+    queryKey: ["join-requests", eventId, userId],
+    enabled: enabled && Boolean(userId),
+    queryFn: async (): Promise<JoinRequest[]> => {
+      const { data, error } = await supabase()
+        .from("event_join_requests")
+        .select(`requested_at, profiles ( ${PROFILE_FIELDS} )`)
+        .eq("event_id", eventId)
+        .eq("status", "pending")
+        .order("requested_at");
+      if (error) throw error;
+      return (data as unknown as { requested_at: string; profiles: ProfileRow | null }[]).flatMap(
+        (row) =>
+          row.profiles ? [{ person: toProfile(row.profiles), requestedAt: row.requested_at }] : []
+      );
+    },
+  });
+}
+
+/** For the host: accept (making them an attendee) or decline a request. */
+export function useRespondToJoinRequest(eventId: string) {
+  const invalidate = useInvalidateEvents();
+  return useMutation({
+    mutationFn: async ({ userId, accept }: { userId: string; accept: boolean }) => {
+      const { error } = await supabase().rpc("respond_to_join_request", {
+        p_event_id: eventId,
+        p_user_id: userId,
+        p_accept: accept,
+      });
+      if (error) throw error;
+    },
+    onSettled: () => invalidate(eventId),
   });
 }
 

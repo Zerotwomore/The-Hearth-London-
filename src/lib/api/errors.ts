@@ -4,6 +4,8 @@ import type { StringKey } from "@/lib/i18n/strings";
 // Supabase Auth reports its own codes.
 const MESSAGE_KEYS: Record<string, StringKey> = {
   event_full: "errorEventFull",
+  request_declined: "errorRequestDeclined",
+  request_not_found: "errorNotFound",
   event_limit_reached: "errorEventLimit",
   event_in_past: "errorStartInPast",
   invalid_event: "errorInvalidEvent",

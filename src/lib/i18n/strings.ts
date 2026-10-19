@@ -21,6 +21,10 @@ export const STRINGS = {
   errorSignInRequired: { en: "Please log in first.", zh: "请先登录。" },
   errorEventFull: { en: "Sorry — this event is full.", zh: "抱歉，活动名额已满。" },
   errorEventStarted: { en: "This event has already started.", zh: "活动已经开始。" },
+  errorRequestDeclined: {
+    en: "The host declined your request for this event.",
+    zh: "主办人未通过你的报名申请。",
+  },
   errorRateLimited: {
     en: "You're sending messages too quickly. Wait a moment.",
     zh: "发送太频繁了，请稍等片刻。",
@@ -66,7 +70,22 @@ export const STRINGS = {
   whatYouGet: { en: "What you'll experience", zh: "活动亮点" },
   aboutEvent: { en: "About this event", zh: "活动详情" },
   attendees: { en: "Who's coming", zh: "参与成员" },
-  join: { en: "Join this event", zh: "报名参加" },
+  join: { en: "Ask to join", zh: "申请参加" },
+  requestSent: { en: "Request sent", zh: "已申请" },
+  withdrawRequest: { en: "Withdraw", zh: "撤回申请" },
+  requestPendingNote: {
+    en: "The host will accept or decline your request.",
+    zh: "主办人会审核你的申请。",
+  },
+  requestDeclined: { en: "The host declined your request", zh: "主办人未通过你的申请" },
+  hostApprovesNote: {
+    en: "The host approves everyone who joins.",
+    zh: "所有报名需经主办人同意。",
+  },
+  joinRequests: { en: "Requests to join", zh: "报名申请" },
+  noJoinRequests: { en: "No requests waiting.", zh: "暂无待处理的申请。" },
+  accept: { en: "Accept", zh: "同意" },
+  decline: { en: "Decline", zh: "拒绝" },
   joined: { en: "You're going", zh: "已报名" },
   noEvents: { en: "No events match that search.", zh: "没有找到相关活动。" },
   noUpcomingEvents: {

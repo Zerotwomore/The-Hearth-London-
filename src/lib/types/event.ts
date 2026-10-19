@@ -57,3 +57,12 @@ export interface EventDetailItem extends EventItem {
   /** Missing when signed out: profiles are only visible to members. */
   host?: Profile;
 }
+
+/** A member's own request to join: waiting on the host, or turned down. */
+export type JoinRequestStatus = "pending" | "declined";
+
+/** Someone waiting for the host to accept them. */
+export interface JoinRequest {
+  person: Profile;
+  requestedAt: string;
+}
