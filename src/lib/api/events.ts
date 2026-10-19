@@ -191,23 +191,32 @@ export function useWithdrawJoinRequest() {
   });
 }
 
-/** For the host: people waiting for an answer, oldest request first. */
-export function useJoinRequests(eventId: string, enabled: boolean) {
+/**
+ * For the host: requests for their event, oldest first — pending ones to
+ * answer, and declined ones so a mistaken decline can be undone.
+ */
+export function useJoinRequests(eventId: string) {
   const { userId } = useAppState();
   return useQuery({
     queryKey: ["join-requests", eventId, userId],
-    enabled: enabled && Boolean(userId),
+    enabled: Boolean(userId),
     queryFn: async (): Promise<JoinRequest[]> => {
       const { data, error } = await supabase()
         .from("event_join_requests")
-        .select(`requested_at, profiles ( ${PROFILE_FIELDS} )`)
+        .select(`status, requested_at, profiles ( ${PROFILE_FIELDS} )`)
         .eq("event_id", eventId)
-        .eq("status", "pending")
         .order("requested_at");
       if (error) throw error;
-      return (data as unknown as { requested_at: string; profiles: ProfileRow | null }[]).flatMap(
-        (row) =>
-          row.profiles ? [{ person: toProfile(row.profiles), requestedAt: row.requested_at }] : []
+      return (
+        data as unknown as {
+          status: JoinRequestStatus;
+          requested_at: string;
+          profiles: ProfileRow | null;
+        }[]
+      ).flatMap((row) =>
+        row.profiles
+          ? [{ person: toProfile(row.profiles), status: row.status, requestedAt: row.requested_at }]
+          : []
       );
     },
   });

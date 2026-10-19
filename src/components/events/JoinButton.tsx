@@ -20,7 +20,7 @@ interface JoinButtonProps {
 
 export function JoinButton({ event, joined }: JoinButtonProps) {
   const { t, userId } = useAppState();
-  const { data: myRequests } = useMyJoinRequests();
+  const { data: myRequests, isPending: requestsLoading } = useMyJoinRequests();
   const join = useJoinEvent();
   const leave = useLeaveEvent();
   const withdraw = useWithdrawJoinRequest();
@@ -64,6 +64,13 @@ export function JoinButton({ event, joined }: JoinButtonProps) {
           </Button>
         )}
       </div>
+    );
+  } else if (requestsLoading) {
+    // Don't offer "Ask to join" before we know whether they already asked.
+    button = (
+      <Button size="lg" fullWidth disabled>
+        {t("loading")}
+      </Button>
     );
   } else if (request === "pending") {
     button = (

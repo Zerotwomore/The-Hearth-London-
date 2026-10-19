@@ -84,6 +84,7 @@ export const STRINGS = {
   },
   joinRequests: { en: "Requests to join", zh: "报名申请" },
   noJoinRequests: { en: "No requests waiting.", zh: "暂无待处理的申请。" },
+  declinedRequests: { en: "Declined", zh: "已拒绝" },
   accept: { en: "Accept", zh: "同意" },
   decline: { en: "Decline", zh: "拒绝" },
   joined: { en: "You're going", zh: "已报名" },
