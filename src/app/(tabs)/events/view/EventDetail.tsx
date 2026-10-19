@@ -9,6 +9,7 @@ import { chatHref } from "@/lib/routes";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { JoinButton } from "@/components/events/JoinButton";
+import { JoinRequestList } from "@/components/events/JoinRequestList";
 import { TopBar } from "@/components/ui/TopBar";
 import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
 
@@ -166,6 +167,11 @@ export default function EventDetail({ id }: { id: string }) {
               </div>
             </div>
           </section>
+        )}
+
+        {/* The host decides who comes. */}
+        {event.status === "approved" && event.hostId === userId && (
+          <JoinRequestList eventId={event.id} />
         )}
 
         {/* Attendees */}

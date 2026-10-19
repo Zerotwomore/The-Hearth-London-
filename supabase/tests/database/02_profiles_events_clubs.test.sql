@@ -1,7 +1,7 @@
 -- Profiles, joining events, contact details and clubs, tried as different people.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(30);
 
 -- Fixtures (as the database owner, so no rules apply) -------------------------
 --   host     hosts every event
@@ -86,15 +86,15 @@ select throws_ok(
 );
 select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000001') $$,
-  'Members can join a free event'
+  'Members can ask to join a free event'
 );
 select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000001') $$,
-  'Joining twice is harmless'
+  'Asking twice is harmless'
 );
 select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000002') $$,
-  'Paid events can be joined (payment happens at the event)'
+  'Paid events can be requested (payment happens at the event)'
 );
 select throws_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000003') $$,
@@ -106,6 +106,18 @@ select throws_ok(
   'P0001', 'event_not_found',
   'Unknown events are reported as not found'
 );
+
+-- The host accepts both requests (join requests are tested in 05).
+set local request.jwt.claims = '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated"}';
+select lives_ok(
+  $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
+       '22222222-2222-2222-2222-222222222222', true),
+            public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000002',
+       '22222222-2222-2222-2222-222222222222', true) $$,
+  'The host accepts the member'
+);
+set local request.jwt.claims = '{"sub": "22222222-2222-2222-2222-222222222222", "role": "authenticated"}';
+
 select is(
   (select wechat_id from public.contact_details where user_id = '11111111-1111-1111-1111-111111111111'),
   'hearth_host',
@@ -124,7 +136,14 @@ set local request.jwt.claims = '{"sub": "33333333-3333-3333-3333-333333333333", 
 
 select lives_ok(
   $$ select public.join_event('eeeeeeee-0000-0000-0000-000000000001') $$,
-  'The second place in a two-place event can be taken'
+  'The second member can ask for the last place'
+);
+
+set local request.jwt.claims = '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated"}';
+select lives_ok(
+  $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
+       '33333333-3333-3333-3333-333333333333', true) $$,
+  'The host gives them the second place in a two-place event'
 );
 
 -- As the outsider --------------------------------------------------------------
