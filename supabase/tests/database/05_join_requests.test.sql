@@ -1,7 +1,7 @@
 -- Asking to join an event, and the host answering.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(23);
 
 -- Fixtures ---------------------------------------------------------------------
 --   host      hosts the event (one place)
@@ -110,9 +110,9 @@ select lives_ok(
 );
 select throws_ok(
   $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
-       '33333333-3333-3333-3333-333333333333', true) $$,
+       '33333333-3333-3333-3333-333333333333', false) $$,
   'P0001', 'request_not_found',
-  'Answered requests cannot be answered again'
+  'Declined requests cannot be declined again'
 );
 
 -- After a decline -------------------------------------------------------------------
@@ -154,6 +154,43 @@ select is(
    where user_id = '33333333-3333-3333-3333-333333333333'),
   'declined',
   'Declined requests cannot be deleted to ask again'
+);
+
+-- Undoing a decline, and the start time ------------------------------------------
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated"}';
+
+select lives_ok(
+  $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
+       '33333333-3333-3333-3333-333333333333', true) $$,
+  'Hosts can accept someone they declined'
+);
+
+reset role;
+select is(
+  (select count(*)::integer from public.event_attendees
+   where user_id = '33333333-3333-3333-3333-333333333333'),
+  1,
+  'Accepting a declined request makes them an attendee'
+);
+
+insert into public.event_join_requests (event_id, user_id)
+values ('eeeeeeee-0000-0000-0000-000000000001', '44444444-4444-4444-4444-444444444444');
+update public.events set starts_at = now() - interval '1 hour'
+where id = 'eeeeeeee-0000-0000-0000-000000000001';
+
+set local role authenticated;
+select throws_ok(
+  $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
+       '44444444-4444-4444-4444-444444444444', true) $$,
+  'P0001', 'event_started',
+  'Hosts cannot accept anyone once the event has started'
+);
+select lives_ok(
+  $$ select public.respond_to_join_request('eeeeeeee-0000-0000-0000-000000000001',
+       '44444444-4444-4444-4444-444444444444', false) $$,
+  'Hosts can still decline after the start'
 );
 
 select * from finish();

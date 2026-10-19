@@ -61,8 +61,9 @@ export interface EventDetailItem extends EventItem {
 /** A member's own request to join: waiting on the host, or turned down. */
 export type JoinRequestStatus = "pending" | "declined";
 
-/** Someone waiting for the host to accept them. */
+/** Someone who asked to join, as the host sees them. */
 export interface JoinRequest {
   person: Profile;
+  status: JoinRequestStatus;
   requestedAt: string;
 }
