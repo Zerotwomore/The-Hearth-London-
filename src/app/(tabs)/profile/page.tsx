@@ -12,7 +12,7 @@ import { EventCard } from "@/components/events/EventCard";
 import { ClubCard } from "@/components/clubs/ClubCard";
 import { SignInPrompt } from "@/components/auth/SignInPrompt";
 import { LoadingState } from "@/components/ui/StatusMessage";
-import { useEvents, useMyEventIds } from "@/lib/api/events";
+import { useEvents, useHostedEvents, useMyEventIds, usePendingEvents } from "@/lib/api/events";
 import { useClubs, useMyClubIds } from "@/lib/api/clubs";
 import { useInterests } from "@/lib/api/profile";
 import { signOut } from "@/lib/api/auth";
@@ -24,11 +24,16 @@ export default function ProfilePage() {
   const { t, tx, lang, userId, email, profile, authReady, profileLoading } = useAppState();
   const { data: events } = useEvents();
   const { data: myEventIds } = useMyEventIds();
+  const { data: hostedEvents } = useHostedEvents();
+  const { data: pendingEvents } = usePendingEvents(Boolean(profile?.isAdmin));
   const { data: clubs } = useClubs();
   const { data: myClubIds } = useMyClubIds();
   const { data: interests } = useInterests();
 
-  const joinedEvents = (events ?? []).filter((event) => myEventIds?.has(event.id));
+  // Hosted events have their own section.
+  const joinedEvents = (events ?? []).filter(
+    (event) => myEventIds?.has(event.id) && event.hostId !== userId
+  );
   const joinedClubs = (clubs ?? []).filter((club) => myClubIds?.has(club.id));
   const myInterests = (interests ?? []).filter((interest) =>
     profile?.interestIds.includes(interest.id)
@@ -107,6 +112,35 @@ export default function ProfilePage() {
             </div>
           </section>
         )}
+
+        {profile.isAdmin && (
+          <Link
+            href="/events/review"
+            className="mt-6 flex items-center justify-between rounded-card border border-hearth-gold/40 bg-hearth-paper px-4 py-3"
+          >
+            <span className="text-[15px] font-semibold text-hearth-ink">{t("reviewEvents")}</span>
+            <span className="text-[13px] text-hearth-ember">
+              {pendingEvents ? `${pendingEvents.length} ${t("statusPending").toLowerCase()} →` : "→"}
+            </span>
+          </Link>
+        )}
+
+        <section className="pt-8">
+          <SectionHeader
+            title={t("yourHostedEvents")}
+            actionLabel={t("hostEvent")}
+            actionHref="/events/new"
+          />
+          {(hostedEvents ?? []).length === 0 ? (
+            <p className="text-[14px] text-hearth-charcoal-soft">{t("noHostedEvents")}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-7">
+              {hostedEvents!.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className="pt-8">
           <SectionHeader

@@ -47,6 +47,29 @@ export default function EventDetail({ id }: { id: string }) {
       <TopBar title={category ? tx(category.label) : t("navEvents")} backHref="/events" />
 
       <div className="pb-32">
+        {/* Only the host and admins ever see events that aren't approved. */}
+        {event.status !== "approved" && (
+          <div
+            className={
+              event.status === "pending"
+                ? "mx-5 mt-5 rounded-card border border-hearth-gold/40 bg-hearth-paper px-4 py-3"
+                : "mx-5 mt-5 rounded-card border border-hearth-ember/40 bg-hearth-paper px-4 py-3"
+            }
+          >
+            <p className="eyebrow text-hearth-gold">
+              {event.status === "pending" ? t("statusPending") : t("statusRejected")}
+            </p>
+            <p className="mt-1 text-[14px] text-hearth-charcoal">
+              {event.status === "pending" ? t("pendingNotice") : t("rejectedNotice")}
+            </p>
+            {event.reviewNote && (
+              <p className="mt-2 text-[14px] text-hearth-charcoal-soft">
+                {t("reviewNoteLabel")}: {event.reviewNote}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Poster */}
         <div className="px-5 pt-5">
           <div className="mx-auto aspect-[3/4] w-[78%] overflow-hidden rounded-[6px] frame bg-hearth-cream-dark">
@@ -166,23 +189,25 @@ export default function EventDetail({ id }: { id: string }) {
       </div>
 
       {/* Sticky CTA */}
-      <div className="sticky bottom-0 z-10 border-t border-hearth-ink/10 bg-hearth-cream/95 px-5 py-3 backdrop-blur">
-        <JoinButton event={event} joined={joined} />
-        {conversationId ? (
-          <Link
-            href={chatHref(conversationId)}
-            className="mt-2 block text-center text-[13px] text-hearth-charcoal-soft hover:text-hearth-ember"
-          >
-            {t("openGroupChat")} →
-          </Link>
-        ) : (
-          event.pricePence > 0 && (
-            <p className="mt-2 text-center text-[12px] text-hearth-charcoal-soft">
-              {t("payAtEvent")}
-            </p>
-          )
-        )}
-      </div>
+      {event.status === "approved" && (
+        <div className="sticky bottom-0 z-10 border-t border-hearth-ink/10 bg-hearth-cream/95 px-5 py-3 backdrop-blur">
+          <JoinButton event={event} joined={joined} />
+          {conversationId ? (
+            <Link
+              href={chatHref(conversationId)}
+              className="mt-2 block text-center text-[13px] text-hearth-charcoal-soft hover:text-hearth-ember"
+            >
+              {t("openGroupChat")} →
+            </Link>
+          ) : (
+            event.pricePence > 0 && (
+              <p className="mt-2 text-center text-[12px] text-hearth-charcoal-soft">
+                {t("payAtEvent")}
+              </p>
+            )
+          )}
+        </div>
+      )}
     </>
   );
 }

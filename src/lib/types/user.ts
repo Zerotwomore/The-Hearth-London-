@@ -19,4 +19,6 @@ export interface OwnProfile extends Profile {
   /** Null until the member has finished onboarding. */
   onboardedAt: string | null;
   interestIds: string[];
+  /** Admins review events submitted by members. Set by staff. */
+  isAdmin: boolean;
 }

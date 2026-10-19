@@ -86,6 +86,81 @@ export const STRINGS = {
   openGroupChat: { en: "Open the group chat", zh: "进入活动群聊" },
   logInToSeeAttendees: { en: "Log in to see who's coming.", zh: "登录后查看参与成员。" },
 
+  // Hosting
+  hostEvent: { en: "Host an event", zh: "发起活动" },
+  hostShort: { en: "Host", zh: "发起" },
+  hostEventIntro: {
+    en: "Every event is checked by The Hearth team before it goes live.",
+    zh: "所有活动都会经过 The Hearth 团队审核后才会发布。",
+  },
+  activeEventCount: { en: "active events", zh: "个进行中的活动" },
+  eventLimitReached: {
+    en: "You have 20 active events — the most you can host at once. You can host another once one has ended.",
+    zh: "你已有 20 个进行中的活动，已达上限。待其中一个结束后即可再发起。",
+  },
+  posterLabel: { en: "Poster", zh: "海报" },
+  posterHint: { en: "Portrait works best — it's cropped to 3:4.", zh: "建议竖版图片，将裁剪为 3:4。" },
+  choosePoster: { en: "Choose a poster", zh: "选择海报" },
+  changePoster: { en: "Change poster", zh: "更换海报" },
+  eventTitleLabel: { en: "Title", zh: "活动名称" },
+  categoryLabel: { en: "Category", zh: "类别" },
+  dateLabel: { en: "Date", zh: "日期" },
+  startTimeLabel: { en: "Starts", zh: "开始时间" },
+  endTimeLabel: { en: "Ends (optional)", zh: "结束时间（可选）" },
+  venueLabel: { en: "Venue", zh: "地点" },
+  venuePlaceholder: { en: "e.g. The Hearth, 12 Greek St", zh: "例如：The Hearth，12 Greek St" },
+  areaLabel: { en: "Area", zh: "区域" },
+  areaPlaceholder: { en: "e.g. Soho", zh: "例如：Soho" },
+  capacityLabel: { en: "Places", zh: "名额" },
+  capacityHint: { en: "Not counting you — up to 200.", zh: "不含你本人，最多 200。" },
+  priceLabel: { en: "Price per person (£)", zh: "每人费用（£）" },
+  priceHint: { en: "Leave at 0 for free. Guests pay you at the event.", zh: "免费请填 0。参与者现场向你付款。" },
+  descriptionLabel: { en: "About the event", zh: "活动介绍" },
+  submitForReview: { en: "Submit for review", zh: "提交审核" },
+  publishEvent: { en: "Publish event", zh: "发布活动" },
+  submitting: { en: "Submitting…", zh: "提交中…" },
+  errorStartInPast: { en: "Pick a start time in the future.", zh: "请选择未来的开始时间。" },
+  errorEndTooLong: { en: "Events can last up to 2 days.", zh: "活动时长最多 2 天。" },
+  logInToHost: { en: "Log in to host an event.", zh: "登录后发起活动。" },
+
+  // Review status
+  statusPending: { en: "Awaiting approval", zh: "待审核" },
+  statusRejected: { en: "Not approved", zh: "未通过" },
+  pendingNotice: {
+    en: "This event is waiting for approval. Only you and the admins can see it.",
+    zh: "活动正在等待审核，目前只有你和管理员可以看到。",
+  },
+  rejectedNotice: {
+    en: "This event wasn't approved, so it isn't listed.",
+    zh: "活动未通过审核，不会公开展示。",
+  },
+  reviewNoteLabel: { en: "Note from the team", zh: "团队留言" },
+  yourHostedEvents: { en: "Events you're hosting", zh: "我发起的活动" },
+  noHostedEvents: { en: "You aren't hosting anything yet.", zh: "你还没有发起活动。" },
+
+  // Admin review
+  reviewEvents: { en: "Review events", zh: "审核活动" },
+  reviewQueueEmpty: { en: "Nothing waiting for review.", zh: "暂无待审核的活动。" },
+  approve: { en: "Approve", zh: "通过" },
+  reject: { en: "Reject", zh: "拒绝" },
+  rejectNotePlaceholder: {
+    en: "Optional note to the host",
+    zh: "给主办人的留言（可选）",
+  },
+  confirmReject: { en: "Reject event", zh: "确认拒绝" },
+  cancel: { en: "Cancel", zh: "取消" },
+  adminsOnly: { en: "Only admins can review events.", zh: "只有管理员可以审核活动。" },
+  submittedBy: { en: "Submitted by", zh: "提交人" },
+  errorEventLimit: {
+    en: "You already have 20 active events, the most you can host at once.",
+    zh: "你已有 20 个进行中的活动，已达上限。",
+  },
+  errorInvalidEvent: {
+    en: "Some details aren't valid. Check the form and try again.",
+    zh: "部分信息无效，请检查后重试。",
+  },
+  errorNotAllowed: { en: "You don't have permission to do that.", zh: "你没有权限执行此操作。" },
+
   // Clubs
   clubsTitle: { en: "Clubs", zh: "社群" },
   clubsSubtitle: { en: "Find your people", zh: "找到同好" },

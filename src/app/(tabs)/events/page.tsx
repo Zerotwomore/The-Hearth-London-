@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { TopBar } from "@/components/ui/TopBar";
+import { Button } from "@/components/ui/Button";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { EventCard } from "@/components/events/EventCard";
 import { EventFilterBar } from "@/components/events/EventFilterBar";
@@ -31,7 +33,14 @@ export default function EventsPage() {
         title={t("eventsTitle")}
         subtitle={t("eventsSubtitle")}
         large
-        action={<LanguageToggle />}
+        action={
+          <div className="flex items-center gap-2">
+            <Link href="/events/new">
+              <Button size="sm">+ {t("hostShort")}</Button>
+            </Link>
+            <LanguageToggle />
+          </div>
+        }
       />
 
       <div className="px-5 pt-4 pb-24">
