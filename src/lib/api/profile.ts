@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/api/supabase";
 import { avatarUrl } from "@/lib/api/rows";
+import { imageExtension, resizeImage } from "@/lib/api/images";
 import { LocalizedText, Lang } from "@/lib/types/i18n";
 import { OwnProfile } from "@/lib/types/user";
 
@@ -30,6 +31,7 @@ interface OwnProfileRow {
   avatar_path: string | null;
   bio: string | null;
   verified: boolean;
+  is_admin: boolean;
   lang: Lang;
   onboarded_at: string | null;
   profile_interests: { interest_id: string }[] | null;
@@ -39,7 +41,7 @@ export async function fetchOwnProfile(userId: string): Promise<OwnProfile | null
   const { data, error } = await supabase()
     .from("profiles")
     .select(
-      "id, name, name_zh, avatar_path, bio, verified, lang, onboarded_at, profile_interests ( interest_id )"
+      "id, name, name_zh, avatar_path, bio, verified, is_admin, lang, onboarded_at, profile_interests ( interest_id )"
     )
     .eq("id", userId)
     .maybeSingle();
@@ -54,6 +56,7 @@ export async function fetchOwnProfile(userId: string): Promise<OwnProfile | null
     avatarUrl: avatarUrl(row.avatar_path),
     bio: row.bio ?? undefined,
     verified: row.verified,
+    isAdmin: row.is_admin,
     lang: row.lang,
     onboardedAt: row.onboarded_at,
     interestIds: (row.profile_interests ?? []).map((item) => item.interest_id),
@@ -122,37 +125,8 @@ const AVATAR_SIZE = 400;
  * and uploads it to the member's own folder. Returns the storage path.
  */
 export async function uploadAvatar(userId: string, file: File): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const side = Math.min(bitmap.width, bitmap.height);
-  const canvas = document.createElement("canvas");
-  canvas.width = AVATAR_SIZE;
-  canvas.height = AVATAR_SIZE;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("Canvas is not supported");
-  context.drawImage(
-    bitmap,
-    (bitmap.width - side) / 2,
-    (bitmap.height - side) / 2,
-    side,
-    side,
-    0,
-    0,
-    AVATAR_SIZE,
-    AVATAR_SIZE
-  );
-  bitmap.close();
-
-  const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob(
-      (result) => (result ? resolve(result) : reject(new Error("Could not encode image"))),
-      "image/webp",
-      0.85
-    )
-  );
-  // Safari before 17 can't encode WebP and silently returns PNG, which the
-  // bucket also accepts.
-  const extension = blob.type === "image/webp" ? "webp" : "png";
-  const path = `${userId}/${Date.now()}.${extension}`;
+  const blob = await resizeImage(file, AVATAR_SIZE, AVATAR_SIZE);
+  const path = `${userId}/${Date.now()}.${imageExtension(blob)}`;
   const { error } = await supabase()
     .storage.from("avatars")
     .upload(path, blob, { contentType: blob.type, upsert: false });

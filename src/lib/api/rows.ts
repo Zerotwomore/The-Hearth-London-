@@ -3,7 +3,7 @@
 
 import { LocalizedText } from "@/lib/types/i18n";
 import { Profile } from "@/lib/types/user";
-import { EventItem } from "@/lib/types/event";
+import { EventItem, EventStatus } from "@/lib/types/event";
 import { publicStorageUrl } from "@/lib/api/supabase";
 
 /** Columns needed to show someone: name, avatar, badge. */
@@ -40,10 +40,18 @@ export function toProfiles(rows: { profiles: ProfileRow | null }[] | null): Prof
 
 // Events ---------------------------------------------------------------------
 
+/**
+ * Staff events store a full poster URL; member-hosted events store a path in
+ * the public "event-media" bucket (<host_id>/<file>).
+ */
+export function posterSrc(posterUrl: string): string {
+  return /^https?:\/\//.test(posterUrl) ? posterUrl : publicStorageUrl("event-media", posterUrl);
+}
+
 const PUBLIC_EVENT_FIELDS = `
   id, title, category_id, poster_url, gallery_urls, starts_at, ends_at,
   location_name, location_area, host_id, capacity, description, highlights,
-  price_pence, price_label
+  price_pence, price_label, status, review_note
 `;
 
 /**
@@ -72,6 +80,8 @@ export interface EventRow {
   highlights: LocalizedText[];
   price_pence: number;
   price_label: LocalizedText | null;
+  status: EventStatus;
+  review_note: string | null;
   /** Absent when loaded signed out. */
   event_attendees?: { joined_at: string; profiles: ProfileRow | null }[] | null;
 }
@@ -96,7 +106,7 @@ export function toEvent(row: EventRow): EventItem {
     id: row.id,
     title: row.title,
     categoryId: row.category_id,
-    posterUrl: row.poster_url,
+    posterUrl: posterSrc(row.poster_url),
     gallery: row.gallery_urls ?? [],
     startsAt: row.starts_at,
     endsAt: row.ends_at ?? undefined,
@@ -108,6 +118,8 @@ export function toEvent(row: EventRow): EventItem {
     price: priceText(row.price_pence, row.price_label),
     pricePence: row.price_pence,
     attendees: toProfiles(attendees),
+    status: row.status,
+    reviewNote: row.review_note ?? undefined,
   };
 }
 

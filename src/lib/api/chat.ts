@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/api/supabase";
-import { PROFILE_FIELDS, ProfileRow, isUuid, toProfile } from "@/lib/api/rows";
+import { PROFILE_FIELDS, ProfileRow, isUuid, posterSrc, toProfile } from "@/lib/api/rows";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { ConversationSummary, Message } from "@/lib/types/chat";
 import { LocalizedText } from "@/lib/types/i18n";
@@ -41,7 +41,7 @@ export function useMyConversations() {
         id: row.conversation_id,
         eventId: row.event_id,
         title: row.title,
-        posterUrl: row.poster_url,
+        posterUrl: posterSrc(row.poster_url),
         startsAt: row.starts_at,
         isOpen: row.is_open,
         lastMessageAt: row.last_message_at ?? undefined,
@@ -109,7 +109,7 @@ export function useConversation(id: string) {
         event: {
           id: event.id,
           title: event.title,
-          posterUrl: event.poster_url,
+          posterUrl: posterSrc(event.poster_url),
           location: { name: event.location_name, area: event.location_area },
           startsAt: event.starts_at,
           endsAt: event.ends_at ?? undefined,

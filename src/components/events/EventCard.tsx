@@ -28,7 +28,17 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
               {tx(category.label)}
             </span>
           )}
-          {joined && (
+          {event.status !== "approved" ? (
+            <span
+              className={
+                event.status === "pending"
+                  ? "absolute right-2 top-2 rounded-pill bg-hearth-gold px-2.5 py-1 text-[10px] font-semibold text-hearth-paper"
+                  : "absolute right-2 top-2 rounded-pill bg-hearth-ember px-2.5 py-1 text-[10px] font-semibold text-hearth-paper"
+              }
+            >
+              {event.status === "pending" ? t("statusPending") : t("statusRejected")}
+            </span>
+          ) : joined && (
             <span className="absolute right-2 top-2 rounded-pill bg-hearth-success px-2.5 py-1 text-[10px] font-semibold text-hearth-paper">
               {t("joined")}
             </span>

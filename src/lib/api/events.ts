@@ -12,7 +12,8 @@ import {
   toProfile,
 } from "@/lib/api/rows";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { EventCategory, EventDetailItem, EventItem } from "@/lib/types/event";
+import { imageExtension, resizeImage } from "@/lib/api/images";
+import { EventCategory, EventDetailItem, EventItem, NewEvent } from "@/lib/types/event";
 import { LocalizedText } from "@/lib/types/i18n";
 
 // Queries are keyed on the signed-in user: signed-out visitors see less
@@ -45,6 +46,7 @@ export function useEvents() {
       const { data, error } = await supabase()
         .from("events")
         .select(eventFields(Boolean(userId)))
+        .eq("status", "approved")
         .gte("starts_at", new Date().toISOString())
         .order("starts_at");
       if (error) throw error;
@@ -136,5 +138,117 @@ export function useLeaveEvent() {
       if (error) throw error;
     },
     onSettled: (_data, _error, eventId) => invalidate(eventId),
+  });
+}
+
+// Hosting ----------------------------------------------------------------------
+
+/** Matches create_event(): pending or approved events that haven't ended yet. */
+export const MAX_ACTIVE_EVENTS = 20;
+
+/** Events the member hosts that haven't ended, in any review state, soonest first. */
+export function useHostedEvents() {
+  const { userId } = useAppState();
+  return useQuery({
+    queryKey: ["hosted-events", userId],
+    enabled: Boolean(userId),
+    queryFn: async (): Promise<EventItem[]> => {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase()
+        .from("events")
+        .select(eventFields(true))
+        .eq("host_id", userId!)
+        .or(`ends_at.gt.${now},and(ends_at.is.null,starts_at.gt.${now})`)
+        .order("starts_at");
+      if (error) throw error;
+      return (data as unknown as EventRow[]).map(toEvent);
+    },
+  });
+}
+
+/** For admins: events waiting for review, oldest submission first. */
+export function usePendingEvents(enabled: boolean) {
+  const { userId } = useAppState();
+  return useQuery({
+    queryKey: ["pending-events", userId],
+    enabled: enabled && Boolean(userId),
+    queryFn: async (): Promise<EventDetailItem[]> => {
+      const { data, error } = await supabase()
+        .from("events")
+        .select(`${eventFields(true)}, host:profiles!events_host_id_fkey ( ${PROFILE_FIELDS} )`)
+        .eq("status", "pending")
+        .order("submitted_at");
+      if (error) throw error;
+      return (data as unknown as (EventRow & { host: ProfileRow | null })[]).map((row) => ({
+        ...toEvent(row),
+        host: row.host ? toProfile(row.host) : undefined,
+      }));
+    },
+  });
+}
+
+const POSTER_WIDTH = 900;
+const POSTER_HEIGHT = 1200;
+
+/**
+ * Uploads the poster (cropped to 3:4) to the host's folder, then submits the
+ * event through create_event(), which enforces the active-event limit.
+ * Resolves to the new event's id. Members' events start out pending.
+ */
+export function useCreateEvent() {
+  const { userId } = useAppState();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (event: NewEvent): Promise<string> => {
+      const blob = await resizeImage(event.poster, POSTER_WIDTH, POSTER_HEIGHT);
+      const path = `${userId}/${Date.now()}.${imageExtension(blob)}`;
+      const upload = await supabase()
+        .storage.from("event-media")
+        .upload(path, blob, { contentType: blob.type, upsert: false });
+      if (upload.error) throw upload.error;
+
+      const { data, error } = await supabase().rpc("create_event", {
+        p_title: event.title,
+        p_category_id: event.categoryId,
+        p_poster_path: path,
+        p_starts_at: event.startsAt.toISOString(),
+        p_ends_at: event.endsAt?.toISOString() ?? null,
+        p_location_name: event.locationName,
+        p_location_area: event.locationArea,
+        p_capacity: event.capacity,
+        p_description: event.description,
+        p_price_pence: event.pricePence,
+      });
+      if (error) throw error;
+      return data as string;
+    },
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["events"] }),
+        queryClient.invalidateQueries({ queryKey: ["hosted-events"] }),
+        queryClient.invalidateQueries({ queryKey: ["pending-events"] }),
+        queryClient.invalidateQueries({ queryKey: ["my-event-ids"] }),
+      ]),
+  });
+}
+
+/** For admins: approve or reject a pending event, with an optional note to the host. */
+export function useReviewEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (review: { eventId: string; approve: boolean; note?: string }) => {
+      const { error } = await supabase().rpc("review_event", {
+        p_event_id: review.eventId,
+        p_approve: review.approve,
+        p_note: review.note ?? null,
+      });
+      if (error) throw error;
+    },
+    onSettled: (_data, _error, review) =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["events"] }),
+        queryClient.invalidateQueries({ queryKey: ["event", review.eventId] }),
+        queryClient.invalidateQueries({ queryKey: ["pending-events"] }),
+      ]),
   });
 }

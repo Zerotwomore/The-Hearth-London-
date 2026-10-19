@@ -28,6 +28,29 @@ export interface EventItem {
    * attendee lists are only visible to members.
    */
   attendees: Profile[];
+  /**
+   * Events hosted by members wait for an admin's approval. Only the host and
+   * admins ever see events that aren't approved.
+   */
+  status: EventStatus;
+  /** An admin's note to the host, e.g. why the event was rejected. */
+  reviewNote?: string;
+}
+
+export type EventStatus = "pending" | "approved" | "rejected";
+
+/** What a member fills in to host an event. */
+export interface NewEvent {
+  title: string;
+  categoryId: string;
+  poster: File;
+  startsAt: Date;
+  endsAt?: Date;
+  locationName: string;
+  locationArea: string;
+  capacity: number;
+  description: string;
+  pricePence: number;
 }
 
 export interface EventDetailItem extends EventItem {

@@ -19,12 +19,23 @@ supabase/
 | Area | Tables | Key rules |
 |---|---|---|
 | People | `profiles`, `profile_interests`, `contact_details` | Anyone signed in can read profiles; only you can edit yours, and never `verified`. Your WeChat ID is only visible to people who share an event with you. |
-| Events | `events`, `event_attendees` | Events are public (so shared links preview). Joining is only through `join_event()`, which checks capacity (with a row lock) and start time. |
+| Events | `events`, `event_attendees` | Approved events are public (so shared links preview). Members host events through `create_event()` — at most 20 active (pending or approved, not yet ended) per member. Members' events start `pending` and are visible only to the host and admins until an admin approves them with `review_event()`; admins' own events are approved immediately. Joining is only through `join_event()`, which checks approval, capacity (with a row lock) and start time. |
 | Clubs | `clubs`, `club_members`, `club_posts` | Anyone can join; only members can post; authors and club admins can delete posts. |
 | Chat | `conversations`, `messages`, `conversation_reads` | One group chat per event, created automatically. Only the host and attendees can read or post; it becomes read-only 7 days after the event. 20 messages/minute, 20 images/day. |
-| Storage | buckets `avatars`, `event-media`, `chat-media` | Size and type caps enforced by Storage. Chat images are private, 40 uploads/day, and deleted 30 days after the event. |
+| Storage | buckets `avatars`, `event-media`, `chat-media` | Size and type caps enforced by Storage. Hosts upload posters to `event-media/<their id>/`, 20 a day. Chat images are private, 40 uploads/day, and deleted 30 days after the event. |
 
-Events and clubs are created by staff in the Supabase dashboard for now.
+Clubs are created by staff in the Supabase dashboard for now.
+
+**Admins** (`profiles.is_admin`) review events submitted by members, in the
+app under Profile → Review events. The flag can only be set from the SQL
+editor; the first admin is set by the `member_hosted_events` migration if
+that account already exists. To add one (the account must have confirmed
+its email):
+
+```sql
+update public.profiles set is_admin = true
+where id = (select id from auth.users where email = 'someone@example.com');
+```
 Paid events are joined in the app and paid for at the event; the price is
 for information. VIP is not part of the MVP.
 
@@ -65,6 +76,7 @@ runs every migration and test against a real Supabase stack on each push.
   instant, so add the new shape first, ship the app change, then remove the
   old one in a later migration.
 - **Error codes** raised for the app — `event_full`, `event_started`,
+  `event_limit_reached`, `event_in_past`, `invalid_event`, `not_allowed`,
   `event_not_found`, `not_authenticated`,
   `rate_limited`, `image_limit_reached`, `conversation_not_found` — are part
   of the contract; the app maps them to user-facing text.
