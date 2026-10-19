@@ -11,6 +11,7 @@ const MESSAGE_KEYS: Record<string, StringKey> = {
   invalid_event: "errorInvalidEvent",
   not_allowed: "errorNotAllowed",
   event_started: "errorEventStarted",
+  event_ended: "errorEventEnded",
   event_not_found: "errorNotFound",
   conversation_not_found: "errorNotFound",
   not_authenticated: "errorSignInRequired",

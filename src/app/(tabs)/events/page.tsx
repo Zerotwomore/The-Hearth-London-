@@ -18,14 +18,20 @@ export default function EventsPage() {
   const eventsQuery = useEvents();
   const { data: myEventIds } = useMyEventIds();
 
+  // Cancelled events stay on attendees' profiles but aren't listed here.
+  const listed = useMemo(
+    () => (eventsQuery.data ?? []).filter((event) => event.status === "approved"),
+    [eventsQuery.data]
+  );
+
   const events = useMemo(() => {
-    return (eventsQuery.data ?? []).filter((event) => {
+    return listed.filter((event) => {
       const matchesCategory = category === "all" || event.categoryId === category;
       const haystack = `${event.title.en} ${event.title.zh} ${event.location.area.en} ${event.location.area.zh}`.toLowerCase();
       const matchesQuery = haystack.includes(query.trim().toLowerCase());
       return matchesCategory && matchesQuery;
     });
-  }, [eventsQuery.data, category, query]);
+  }, [listed, category, query]);
 
   return (
     <>
@@ -73,7 +79,7 @@ export default function EventsPage() {
           <LoadingState />
         ) : eventsQuery.isError ? (
           <ErrorState onRetry={() => eventsQuery.refetch()} />
-        ) : eventsQuery.data.length === 0 ? (
+        ) : listed.length === 0 ? (
           <StatusMessage>{t("noUpcomingEvents")}</StatusMessage>
         ) : events.length === 0 ? (
           <StatusMessage>{t("noEvents")}</StatusMessage>

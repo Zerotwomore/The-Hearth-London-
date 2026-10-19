@@ -18,6 +18,7 @@ import { errorKey } from "@/lib/api/errors";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { StringKey } from "@/lib/i18n/strings";
 import { eventHref } from "@/lib/routes";
+import { hasEnded } from "@/lib/utils";
 
 const MAX_DURATION_MS = 2 * 24 * 60 * 60 * 1000;
 
@@ -44,8 +45,10 @@ export default function NewEventPage() {
     );
   }
 
-  // Rejected events don't count towards the limit.
-  const active = (hosted.data ?? []).filter((event) => event.status !== "rejected").length;
+  // Matches create_event(): pending or approved events that haven't ended.
+  const active = (hosted.data ?? []).filter(
+    (event) => (event.status === "pending" || event.status === "approved") && !hasEnded(event)
+  ).length;
 
   return (
     <>

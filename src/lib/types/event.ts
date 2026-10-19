@@ -30,14 +30,15 @@ export interface EventItem {
   attendees: Profile[];
   /**
    * Events hosted by members wait for an admin's approval. Only the host and
-   * admins ever see events that aren't approved.
+   * admins ever see events that aren't approved — except cancelled ones,
+   * which their attendees still see.
    */
   status: EventStatus;
   /** An admin's note to the host, e.g. why the event was rejected. */
   reviewNote?: string;
 }
 
-export type EventStatus = "pending" | "approved" | "rejected";
+export type EventStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 /** What a member fills in to host an event. */
 export interface NewEvent {

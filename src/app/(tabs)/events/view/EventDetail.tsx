@@ -4,14 +4,26 @@ import Link from "next/link";
 import { useEvent, useCategories, useMyEventIds } from "@/lib/api/events";
 import { useEventConversationId } from "@/lib/api/chat";
 import { useAppState } from "@/lib/context/AppStateContext";
-import { displayName, formatFullDate, formatTimeRange } from "@/lib/utils";
+import { cn, displayName, formatFullDate, formatTimeRange, hasEnded } from "@/lib/utils";
+import { StringKey } from "@/lib/i18n/strings";
+import { EventStatus } from "@/lib/types/event";
 import { chatHref } from "@/lib/routes";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { JoinButton } from "@/components/events/JoinButton";
 import { JoinRequestList } from "@/components/events/JoinRequestList";
+import { HostControls } from "@/components/events/HostControls";
 import { TopBar } from "@/components/ui/TopBar";
 import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
+
+const STATUS_NOTICE: Record<
+  Exclude<EventStatus, "approved">,
+  { label: StringKey; notice: StringKey }
+> = {
+  pending: { label: "statusPending", notice: "pendingNotice" },
+  rejected: { label: "statusRejected", notice: "rejectedNotice" },
+  cancelled: { label: "statusCancelled", notice: "cancelledNotice" },
+};
 
 export default function EventDetail({ id }: { id: string }) {
   const { tx, t, lang, userId } = useAppState();
@@ -48,25 +60,35 @@ export default function EventDetail({ id }: { id: string }) {
       <TopBar title={category ? tx(category.label) : t("navEvents")} backHref="/events" />
 
       <div className="pb-32">
-        {/* Only the host and admins ever see events that aren't approved. */}
+        {/* Only the host, admins and (once cancelled) attendees see events
+            that aren't approved. */}
         {event.status !== "approved" && (
           <div
-            className={
+            className={cn(
+              "mx-5 mt-5 rounded-card border bg-hearth-paper px-4 py-3",
               event.status === "pending"
-                ? "mx-5 mt-5 rounded-card border border-hearth-gold/40 bg-hearth-paper px-4 py-3"
-                : "mx-5 mt-5 rounded-card border border-hearth-ember/40 bg-hearth-paper px-4 py-3"
-            }
+                ? "border-hearth-gold/40"
+                : event.status === "cancelled"
+                  ? "border-hearth-ink/25"
+                  : "border-hearth-ember/40"
+            )}
           >
-            <p className="eyebrow text-hearth-gold">
-              {event.status === "pending" ? t("statusPending") : t("statusRejected")}
-            </p>
+            <p className="eyebrow text-hearth-gold">{t(STATUS_NOTICE[event.status].label)}</p>
             <p className="mt-1 text-[14px] text-hearth-charcoal">
-              {event.status === "pending" ? t("pendingNotice") : t("rejectedNotice")}
+              {t(STATUS_NOTICE[event.status].notice)}
             </p>
             {event.reviewNote && (
               <p className="mt-2 text-[14px] text-hearth-charcoal-soft">
                 {t("reviewNoteLabel")}: {event.reviewNote}
               </p>
+            )}
+            {event.status === "cancelled" && conversationId && (
+              <Link
+                href={chatHref(conversationId)}
+                className="mt-2 inline-block text-[14px] font-medium text-hearth-ember hover:underline"
+              >
+                {t("openGroupChat")} →
+              </Link>
             )}
           </div>
         )}
@@ -75,7 +97,14 @@ export default function EventDetail({ id }: { id: string }) {
         <div className="px-5 pt-5">
           <div className="mx-auto aspect-[3/4] w-[78%] overflow-hidden rounded-[6px] frame bg-hearth-cream-dark">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={event.posterUrl} alt={tx(event.title)} className="h-full w-full object-cover" />
+            <img
+              src={event.posterUrl}
+              alt={tx(event.title)}
+              className={cn(
+                "h-full w-full object-cover",
+                (event.status === "cancelled" || hasEnded(event)) && "opacity-60 grayscale"
+              )}
+            />
           </div>
         </div>
 
@@ -173,6 +202,8 @@ export default function EventDetail({ id }: { id: string }) {
         {event.status === "approved" && event.hostId === userId && (
           <JoinRequestList eventId={event.id} />
         )}
+
+        {event.hostId === userId && <HostControls event={event} />}
 
         {/* Attendees */}
         <section className="px-5 pt-7">

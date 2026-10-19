@@ -1,17 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { EventItem } from "@/lib/types/event";
+import { EventItem, EventStatus } from "@/lib/types/event";
 import { eventHref } from "@/lib/routes";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { useCategories } from "@/lib/api/events";
-import { formatEventDateTime } from "@/lib/utils";
+import { cn, formatEventDateTime, hasEnded } from "@/lib/utils";
+import { StringKey } from "@/lib/i18n/strings";
 import { AttendeeAvatarStack } from "@/components/events/AttendeeAvatarStack";
+
+/** Labels for events that aren't simply listed. */
+const STATUS_BADGE: Record<Exclude<EventStatus, "approved">, { label: StringKey; className: string }> = {
+  pending: { label: "statusPending", className: "bg-hearth-gold" },
+  rejected: { label: "statusRejected", className: "bg-hearth-ember" },
+  cancelled: { label: "statusCancelled", className: "bg-hearth-ink" },
+};
 
 export function EventCard({ event, joined = false }: { event: EventItem; joined?: boolean }) {
   const { tx, t, lang } = useAppState();
   const { data: categories } = useCategories();
   const category = categories?.find((item) => item.id === event.categoryId);
+  const ended = hasEnded(event);
 
   return (
     <Link href={eventHref(event.id)} className="group block">
@@ -21,7 +30,10 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
           <img
             src={event.posterUrl}
             alt={tx(event.title)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className={cn(
+              "h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]",
+              (event.status === "cancelled" || ended) && "opacity-60 grayscale"
+            )}
           />
           {category && (
             <span className="absolute left-2 top-2 rounded-pill bg-hearth-ink/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-hearth-paper">
@@ -30,13 +42,16 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
           )}
           {event.status !== "approved" ? (
             <span
-              className={
-                event.status === "pending"
-                  ? "absolute right-2 top-2 rounded-pill bg-hearth-gold px-2.5 py-1 text-[10px] font-semibold text-hearth-paper"
-                  : "absolute right-2 top-2 rounded-pill bg-hearth-ember px-2.5 py-1 text-[10px] font-semibold text-hearth-paper"
-              }
+              className={cn(
+                "absolute right-2 top-2 rounded-pill px-2.5 py-1 text-[10px] font-semibold text-hearth-paper",
+                STATUS_BADGE[event.status].className
+              )}
             >
-              {event.status === "pending" ? t("statusPending") : t("statusRejected")}
+              {t(STATUS_BADGE[event.status].label)}
+            </span>
+          ) : ended ? (
+            <span className="absolute right-2 top-2 rounded-pill bg-hearth-charcoal-soft px-2.5 py-1 text-[10px] font-semibold text-hearth-paper">
+              {t("statusEnded")}
             </span>
           ) : joined && (
             <span className="absolute right-2 top-2 rounded-pill bg-hearth-success px-2.5 py-1 text-[10px] font-semibold text-hearth-paper">
