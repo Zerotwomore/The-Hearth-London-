@@ -154,6 +154,18 @@ export const STRINGS = {
     zh: "主办人已取消本次活动，活动群聊仍可使用。",
   },
   manageEvent: { en: "Manage event", zh: "管理活动" },
+  formatBold: { en: "Bold", zh: "加粗" },
+  formatItalic: { en: "Italic", zh: "斜体" },
+  formatList: { en: "Bullet list", zh: "项目列表" },
+  formatLink: { en: "Link", zh: "链接" },
+  boldText: { en: "bold text", zh: "加粗文字" },
+  italicText: { en: "italic text", zh: "斜体文字" },
+  listItem: { en: "List item", zh: "列表项" },
+  linkText: { en: "link text", zh: "链接文字" },
+  formattingHint: {
+    en: "Select text, then use the buttons to format it.",
+    zh: "选中文字后，点击按钮即可设置格式。",
+  },
   editEvent: { en: "Edit event", zh: "编辑活动" },
   editEventIntro: {
     en: "Change when and where it happens, or the description. Attendees keep their place.",

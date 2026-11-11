@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { VerifiedBadge } from "@/components/ui/VerifiedBadge";
 import { JoinButton } from "@/components/events/JoinButton";
 import { JoinRequestList } from "@/components/events/JoinRequestList";
+import { MarkdownText } from "@/components/ui/MarkdownText";
 import { HostControls } from "@/components/events/HostControls";
 import { TopBar } from "@/components/ui/TopBar";
 import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
@@ -157,9 +158,9 @@ export default function EventDetail({ id }: { id: string }) {
         {/* Description */}
         <section className="px-5 pt-7">
           <h3 className="display text-lg text-hearth-ink">{t("aboutEvent")}</h3>
-          <p className="mt-2 text-[15px] leading-relaxed text-hearth-charcoal">
-            {tx(event.description)}
-          </p>
+          <MarkdownText className="mt-2 text-[15px] leading-relaxed text-hearth-charcoal">
+          {tx(event.description)}
+        </MarkdownText>
         </section>
 
         {/* Highlights */}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { TopBar } from "@/components/ui/TopBar";
+import { MarkdownText } from "@/components/ui/MarkdownText";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { SignInPrompt } from "@/components/auth/SignInPrompt";
@@ -84,9 +85,9 @@ function PendingEvent({ event }: { event: EventDetailItem }) {
         </div>
       </Link>
 
-      <p className="mt-3 line-clamp-4 text-[14px] leading-relaxed text-hearth-charcoal">
+      <MarkdownText className="mt-3 text-[14px] leading-relaxed text-hearth-charcoal">
         {tx(event.description)}
-      </p>
+      </MarkdownText>
 
       {event.host && (
         <div className="mt-3 flex items-center gap-2">
