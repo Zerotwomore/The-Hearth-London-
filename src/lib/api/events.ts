@@ -353,6 +353,40 @@ export function useReviewEvent() {
   });
 }
 
+/** For the host: changes an event's date/time, location and description. */
+export interface EventEdit {
+  eventId: string;
+  startsAt: Date;
+  endsAt?: Date;
+  locationName: string;
+  locationArea: string;
+  description: string;
+}
+
+export function useUpdateEvent() {
+  const invalidate = useInvalidateEvents();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (edit: EventEdit) => {
+      const { error } = await supabase().rpc("update_event", {
+        p_event_id: edit.eventId,
+        p_starts_at: edit.startsAt.toISOString(),
+        p_ends_at: edit.endsAt?.toISOString() ?? null,
+        p_location_name: edit.locationName,
+        p_location_area: edit.locationArea,
+        p_description: edit.description,
+      });
+      if (error) throw error;
+    },
+    onSettled: (_data, _error, edit) =>
+      Promise.all([
+        invalidate(edit.eventId),
+        queryClient.invalidateQueries({ queryKey: ["hosted-events"] }),
+        queryClient.invalidateQueries({ queryKey: ["pending-events"] }),
+      ]),
+  });
+}
+
 /** For the host: marks the event cancelled. Attendees keep it and its chat. */
 export function useCancelEvent() {
   const invalidate = useInvalidateEvents();

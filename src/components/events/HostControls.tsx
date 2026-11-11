@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useCancelEvent, useDeleteEvent } from "@/lib/api/events";
 import { errorKey } from "@/lib/api/errors";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { EventItem } from "@/lib/types/event";
+import { editEventHref } from "@/lib/routes";
 import { hasEnded } from "@/lib/utils";
 
 /**
@@ -54,6 +56,14 @@ export function HostControls({ event }: { event: EventItem }) {
         </div>
       ) : (
         <div className="mt-3 flex gap-2">
+          {canCancel && (
+            <Link
+              href={editEventHref(event.id)}
+              className="rounded-pill border border-hearth-ink/25 px-3.5 py-1.5 text-sm font-medium text-hearth-ink transition-colors hover:border-hearth-ink/60"
+            >
+              {t("editEvent")}
+            </Link>
+          )}
           {canCancel && (
             <Button variant="outline" size="sm" onClick={() => setConfirming("cancel")}>
               {t("cancelEvent")}

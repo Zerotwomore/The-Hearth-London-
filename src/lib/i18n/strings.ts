@@ -154,6 +154,12 @@ export const STRINGS = {
     zh: "主办人已取消本次活动，活动群聊仍可使用。",
   },
   manageEvent: { en: "Manage event", zh: "管理活动" },
+  editEvent: { en: "Edit event", zh: "编辑活动" },
+  editEventIntro: {
+    en: "Change when and where it happens, or the description. Attendees keep their place.",
+    zh: "可修改活动时间、地点和介绍。已报名的参与者不受影响。",
+  },
+  eventNotEditable: { en: "This event can no longer be edited.", zh: "此活动已无法编辑。" },
   cancelEvent: { en: "Cancel event", zh: "取消活动" },
   deleteEvent: { en: "Delete event", zh: "删除活动" },
   confirmCancelEvent: {
