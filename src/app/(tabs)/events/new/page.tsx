@@ -6,6 +6,7 @@ import { TopBar } from "@/components/ui/TopBar";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { TextField } from "@/components/ui/TextField";
+import { RichTextField } from "@/components/ui/RichTextField";
 import { SignInPrompt } from "@/components/auth/SignInPrompt";
 import { LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
 import {
@@ -286,17 +287,12 @@ function EventForm() {
         />
       </div>
 
-      <label className="block">
-        <span className="eyebrow text-hearth-charcoal-soft">{t("descriptionLabel")}</span>
-        <textarea
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          maxLength={2000}
-          rows={6}
-          required
-          className="mt-1.5 w-full rounded-[1rem] border border-hearth-ink/12 bg-hearth-paper px-5 py-3 text-[16px] leading-relaxed text-hearth-ink focus:border-hearth-ember focus:outline-none"
-        />
-      </label>
+      <RichTextField
+        label={t("descriptionLabel")}
+        value={description}
+        onChange={setDescription}
+        maxLength={2000}
+      />
 
       {error && (
         <p role="alert" className="text-center text-[13px] text-hearth-ember">
