@@ -9,6 +9,10 @@ export function eventHref(id: string): string {
   return `/events/view?id=${encodeURIComponent(id)}`;
 }
 
+export function editEventHref(id: string): string {
+  return `/events/edit?id=${encodeURIComponent(id)}`;
+}
+
 export function clubHref(id: string): string {
   return `/clubs/view?id=${encodeURIComponent(id)}`;
 }
