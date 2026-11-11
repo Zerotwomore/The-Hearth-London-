@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # The event list in the home page, sitemap and llms.txt is read when the
+  # site is built, so rebuild every morning to keep it current.
+  schedule:
+    - cron: "0 5 * * *"
 
 permissions:
   contents: read
