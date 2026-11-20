@@ -12,18 +12,18 @@ import { LocalizedText } from "@/lib/types/i18n";
 export const SITE_URL = "https://thehearthlondon.com";
 export const SITE_NAME = "The Hearth London";
 
-export const SITE_TITLE = "The Hearth London — meet people in London through events & clubs";
+export const SITE_TITLE = "The Hearth London, meet people in London through events & clubs";
 export const SITE_DESCRIPTION =
-  "The Hearth London is a bilingual (English / 中文) community for people making London home. Join gallery tours, reading groups, supper clubs, walks, board games and more — and chat with the group before you go.";
+  "The Hearth London is a community for people making London home. Join reading groups, cultural exchange salons, philosophy discussions, psychology circles and more, and chat with the group before you go.";
 
 /** What the platform offers, in the categories the app uses. */
 export const CATEGORIES = [
-  "Art & Culture",
   "Reading groups",
-  "Dinners and supper clubs",
+  "Cultural exchange",
+  "Philosophy",
+  "Psychology",
+  "Art & Culture",
   "Outdoors and walks",
-  "Bars",
-  "Board games",
   "Live events",
 ];
 
@@ -32,7 +32,7 @@ export const FAQ: { question: string; answer: string }[] = [
   {
     question: "What is The Hearth London?",
     answer:
-      "The Hearth London is a bilingual (English and Chinese) community and events app for people making London home. Members meet through small in-person gatherings such as gallery tours, reading groups, supper clubs, long walks and board game nights, and join clubs around shared interests.",
+      "The Hearth London is a community and events app for people making London home. Members meet through small in-person gatherings such as reading groups, cultural exchange salons, philosophy discussions, psychology circles and gallery tours, and join clubs around shared interests.",
   },
   {
     question: "What kinds of events does The Hearth London run?",
@@ -46,17 +46,12 @@ export const FAQ: { question: string; answer: string }[] = [
   {
     question: "How much do events cost?",
     answer:
-      "Every event shows its price up front, and many are free. Where there is a charge, such as a table fee or a per-person cost, you pay the host at the event rather than through the app.",
+      "Every event shows its price up front, and many are free. Where there is a charge, such as a room fee or a per-person cost, you pay the host at the event rather than through the app.",
   },
   {
     question: "Can I host my own event on The Hearth London?",
     answer:
       "Yes. Members can host events from the app by adding a poster, date, venue and description. Events from members are checked by the Hearth team before they go live, and hosts can edit or cancel them afterwards.",
-  },
-  {
-    question: "Is The Hearth London available in Chinese?",
-    answer:
-      "Yes. The Hearth London is fully bilingual — the whole app can be switched between English and 中文 at any time.",
   },
 ];
 

@@ -27,9 +27,10 @@ export const metadata: Metadata = {
     "London events",
     "meet people in London",
     "London social events",
-    "supper club London",
     "reading group London",
-    "Chinese community London",
+    "cultural exchange London",
+    "philosophy London",
+    "psychology London",
   ],
   alternates: { canonical: "/" },
   openGraph: {
