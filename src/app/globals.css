@@ -71,3 +71,135 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ── Homepage: painterly landing page ───────────────────────────────────
+   Scoped to .home-painterly so the rest of the app keeps its palette.
+   Echoes the share-preview painting (src/app/opengraph-image.jpg). */
+.home-painterly {
+  --color-hearth-ink: #172830;
+  --color-hearth-charcoal: #243842;
+  --color-hearth-charcoal-soft: #3f545e;
+  --color-hearth-gold: #c95a18;
+  color: var(--color-hearth-ink);
+}
+
+.home-painterly .display {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.home-painterly .eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* Fixed behind the page (background-attachment: fixed misbehaves on iOS). */
+.home-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #fdf3d2;
+  background-image:
+    /* marigold sun, top right */
+    radial-gradient(circle 280px at 88% 8%, rgba(255, 168, 28, 0.78) 0%, rgba(255, 206, 78, 0.56) 36%, rgba(254, 240, 178, 0.25) 66%, transparent 82%),
+    /* butter-cream sunlight wash */
+    radial-gradient(ellipse 75% 48% at 58% 12%, rgba(255, 246, 202, 0.92) 0%, rgba(254, 232, 156, 0.45) 55%, transparent 85%),
+    /* cerulean bloom, top left */
+    radial-gradient(ellipse 66% 46% at 10% 10%, rgba(86, 158, 212, 0.52) 0%, rgba(138, 194, 224, 0.28) 52%, transparent 80%),
+    /* coral blossom, mid left */
+    radial-gradient(ellipse 62% 44% at 6% 42%, rgba(248, 128, 96, 0.46) 0%, rgba(253, 176, 146, 0.26) 50%, transparent 80%),
+    /* lilac and rose cloud, mid right */
+    radial-gradient(ellipse 64% 46% at 92% 46%, rgba(182, 164, 224, 0.42) 0%, rgba(246, 182, 192, 0.28) 52%, transparent 82%),
+    /* teal leaves, lower left */
+    radial-gradient(ellipse 68% 48% at 14% 82%, rgba(44, 126, 122, 0.36) 0%, rgba(92, 162, 146, 0.2) 54%, transparent 84%),
+    /* tangerine and periwinkle swirl, bottom right */
+    radial-gradient(ellipse 70% 50% at 86% 88%, rgba(246, 134, 48, 0.44) 0%, rgba(122, 154, 216, 0.24) 55%, transparent 85%),
+    linear-gradient(155deg, #e8f2f8 0%, #fdf4d3 28%, #fff9e6 54%, #fbe6d4 78%, #e4eef2 100%);
+}
+
+/* Impasto brush texture over the canvas */
+.home-canvas svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+}
+
+/* Translucent paper card that keeps the text readable */
+.sunlit-veil {
+  background: rgba(255, 252, 243, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 20px 50px -16px rgba(142, 92, 42, 0.16),
+    0 4px 16px -4px rgba(42, 86, 108, 0.08);
+}
+
+.painterly-btn-primary {
+  background: linear-gradient(135deg, #e86428 0%, #d1491d 100%);
+  color: #fffdf7;
+  box-shadow: 0 10px 24px -6px rgba(209, 73, 29, 0.44), 0 2px 6px rgba(255, 180, 68, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.painterly-btn-primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -6px rgba(209, 73, 29, 0.52), 0 4px 10px rgba(255, 180, 68, 0.36);
+}
+
+.painterly-btn-secondary {
+  background: rgba(255, 253, 247, 0.78);
+  border: 1px solid rgba(23, 40, 48, 0.22);
+  color: #172830;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.painterly-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(23, 40, 48, 0.48);
+  transform: translateY(-1px);
+}
+
+/* Category pills and event cards */
+.painterly-pill,
+.painterly-card {
+  background: rgba(255, 252, 244, 0.82);
+  border: 1px solid rgba(217, 130, 68, 0.24);
+  box-shadow: 0 3px 10px -2px rgba(120, 82, 38, 0.08);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.painterly-pill:hover,
+.painterly-card:hover {
+  background: #ffffff;
+  border-color: rgba(217, 86, 38, 0.45);
+  transform: translateY(-1px);
+}
+
+.painterly-link {
+  color: #c44619;
+  text-decoration: underline;
+  text-decoration-color: rgba(196, 70, 25, 0.45);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.painterly-link:hover {
+  color: #9a320e;
+  text-decoration-color: #9a320e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .painterly-btn-primary,
+  .painterly-btn-secondary,
+  .painterly-pill,
+  .painterly-card {
+    transition: none;
+  }
+  .painterly-btn-primary:hover,
+  .painterly-btn-secondary:hover,
+  .painterly-pill:hover,
+  .painterly-card:hover {
+    transform: none;
+  }
+}

@@ -21,7 +21,7 @@ export async function GET() {
     "",
     `> ${SITE_DESCRIPTION}`,
     "",
-    `${SITE_NAME} (also written "The Hearth" or "Hearth London") is a community and events app for people in London. Members host and join small in-person gatherings across the city, each with its own group chat. The whole app is available in English and Chinese (中文).`,
+    `${SITE_NAME} (also written "The Hearth" or "Hearth London") is a community and events app for people in London. Members host and join small in-person gatherings across the city, each with its own group chat.`,
     "",
     "## Key pages",
     "",
