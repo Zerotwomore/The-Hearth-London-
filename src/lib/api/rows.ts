@@ -1,7 +1,7 @@
 // Database row shapes, and how they map to the app's types.
 // Column names follow supabase/migrations; keep the two in step.
 
-import { LocalizedText } from "@/lib/types/i18n";
+import { LocalizedText, original } from "@/lib/types/i18n";
 import { Profile } from "@/lib/types/user";
 import { EventItem, EventStatus } from "@/lib/types/event";
 import { publicStorageUrl } from "@/lib/api/supabase";
@@ -92,7 +92,10 @@ function formatPounds(pence: number): string {
 }
 
 export function priceText(pence: number, label: LocalizedText | null): LocalizedText {
-  if (label) return label;
+  if (label) {
+    const text = original(label);
+    return { en: text, zh: text };
+  }
   if (pence === 0) return { en: "Free", zh: "免费" };
   const amount = formatPounds(pence);
   return { en: `£${amount} per person`, zh: `£${amount}/人` };
@@ -104,17 +107,17 @@ export function toEvent(row: EventRow): EventItem {
   );
   return {
     id: row.id,
-    title: row.title,
+    title: original(row.title),
     categoryId: row.category_id,
     posterUrl: posterSrc(row.poster_url),
     gallery: row.gallery_urls ?? [],
     startsAt: row.starts_at,
     endsAt: row.ends_at ?? undefined,
-    location: { name: row.location_name, area: row.location_area },
+    location: { name: original(row.location_name), area: original(row.location_area) },
     hostId: row.host_id,
     capacity: row.capacity,
-    description: row.description,
-    highlights: row.highlights ?? [],
+    description: original(row.description),
+    highlights: (row.highlights ?? []).map(original),
     price: priceText(row.price_pence, row.price_label),
     pricePence: row.price_pence,
     attendees: toProfiles(attendees),

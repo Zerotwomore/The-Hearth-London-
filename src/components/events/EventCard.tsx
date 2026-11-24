@@ -29,7 +29,7 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={event.posterUrl}
-            alt={tx(event.title)}
+            alt={event.title}
             className={cn(
               "h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]",
               (event.status === "cancelled" || ended) && "opacity-60 grayscale"
@@ -65,10 +65,10 @@ export function EventCard({ event, joined = false }: { event: EventItem; joined?
             {formatEventDateTime(event.startsAt, lang)}
           </p>
           <h3 className="display mt-1 line-clamp-2 text-[17px] text-hearth-ink">
-            {tx(event.title)}
+            {event.title}
           </h3>
           <p className="mt-1 line-clamp-1 text-[13px] text-hearth-charcoal-soft">
-            {tx(event.location.name)} · {tx(event.location.area)}
+            {event.location.name} · {event.location.area}
           </p>
           <div className="mt-2.5 flex items-center justify-between">
             <AttendeeAvatarStack people={event.attendees} max={3} />

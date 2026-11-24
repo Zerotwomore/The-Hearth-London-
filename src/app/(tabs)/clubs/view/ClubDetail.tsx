@@ -44,10 +44,10 @@ export default function ClubDetail({ id }: { id: string }) {
         <div className="px-5 pt-5">
           <div className="aspect-[16/10] w-full overflow-hidden rounded-[6px] frame bg-hearth-cream-dark">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={club.imageUrl} alt={tx(club.name)} className="h-full w-full object-cover" />
+            <img src={club.imageUrl} alt={club.name} className="h-full w-full object-cover" />
           </div>
 
-          <h2 className="display mt-5 text-[26px] text-hearth-ink">{tx(club.name)}</h2>
+          <h2 className="display mt-5 text-[26px] text-hearth-ink">{club.name}</h2>
           {userId && (
             <p className="mt-1 text-[13px] text-hearth-charcoal-soft">
               {club.members.length} {t("members")}
@@ -95,7 +95,7 @@ export default function ClubDetail({ id }: { id: string }) {
         <section className="px-5 pt-7">
           <h3 className="display text-lg text-hearth-ink">{t("aboutClub")}</h3>
           <p className="mt-2 text-[15px] leading-relaxed text-hearth-charcoal">
-            {tx(club.description)}
+            {club.description}
           </p>
         </section>
 

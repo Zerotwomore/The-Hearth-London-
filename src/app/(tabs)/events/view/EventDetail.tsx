@@ -100,7 +100,7 @@ export default function EventDetail({ id }: { id: string }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={event.posterUrl}
-              alt={tx(event.title)}
+              alt={event.title}
               className={cn(
                 "h-full w-full object-cover",
                 (event.status === "cancelled" || hasEnded(event)) && "opacity-60 grayscale"
@@ -115,9 +115,9 @@ export default function EventDetail({ id }: { id: string }) {
             {formatFullDate(event.startsAt, lang)} ·{" "}
             {formatTimeRange(event.startsAt, event.endsAt, lang)}
           </p>
-          <h2 className="display mt-2 text-[26px] text-hearth-ink">{tx(event.title)}</h2>
+          <h2 className="display mt-2 text-[26px] text-hearth-ink">{event.title}</h2>
           <p className="mt-2 text-[15px] text-hearth-charcoal-soft">
-            {tx(event.location.name)} · {tx(event.location.area)}
+            {event.location.name} · {event.location.area}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-hearth-ink/10 py-3">
@@ -159,7 +159,7 @@ export default function EventDetail({ id }: { id: string }) {
         <section className="px-5 pt-7">
           <h3 className="display text-lg text-hearth-ink">{t("aboutEvent")}</h3>
           <MarkdownText className="mt-2 text-[15px] leading-relaxed text-hearth-charcoal">
-          {tx(event.description)}
+          {event.description}
         </MarkdownText>
         </section>
 
@@ -172,7 +172,7 @@ export default function EventDetail({ id }: { id: string }) {
                 <li key={index} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-hearth-gold" />
                   <span className="text-[15px] leading-relaxed text-hearth-charcoal">
-                    {tx(highlight)}
+                    {highlight}
                   </span>
                 </li>
               ))}

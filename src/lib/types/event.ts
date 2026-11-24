@@ -8,18 +8,23 @@ export interface EventCategory {
 
 export interface EventItem {
   id: string;
-  title: LocalizedText;
+  /** Posted content, as the host wrote it — not translated (see `original`). */
+  title: string;
   categoryId: string;
   posterUrl: string;
   gallery: string[];
   startsAt: string;
   endsAt?: string;
-  location: { name: LocalizedText; area: LocalizedText };
+  location: { name: string; area: string };
   hostId: string;
   capacity: number;
-  description: LocalizedText;
-  highlights: LocalizedText[];
-  /** What to show, e.g. "£20 per person", "£6 table fee" or "Free". Paid at the event. */
+  description: string;
+  highlights: string[];
+  /**
+   * What to show, e.g. "£20 per person", "£6 table fee" or "Free". Paid at
+   * the event. Localized when generated from the amount; a host's own label
+   * reads the same in both languages.
+   */
   price: LocalizedText;
   /** 0 when there is nothing to pay. */
   pricePence: number;

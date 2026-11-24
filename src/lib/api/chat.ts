@@ -6,7 +6,7 @@ import { supabase } from "@/lib/api/supabase";
 import { PROFILE_FIELDS, ProfileRow, isUuid, posterSrc, toProfile } from "@/lib/api/rows";
 import { useAppState } from "@/lib/context/AppStateContext";
 import { ConversationSummary, Message } from "@/lib/types/chat";
-import { LocalizedText } from "@/lib/types/i18n";
+import { LocalizedText, original } from "@/lib/types/i18n";
 
 /** How much history a thread loads. */
 const MESSAGE_LIMIT = 200;
@@ -40,7 +40,7 @@ export function useMyConversations() {
       return (data as ConversationSummaryRow[]).map((row) => ({
         id: row.conversation_id,
         eventId: row.event_id,
-        title: row.title,
+        title: original(row.title),
         posterUrl: posterSrc(row.poster_url),
         startsAt: row.starts_at,
         isOpen: row.is_open,
@@ -58,9 +58,9 @@ export interface ConversationDetail {
   id: string;
   event: {
     id: string;
-    title: LocalizedText;
+    title: string;
     posterUrl: string;
-    location: { name: LocalizedText; area: LocalizedText };
+    location: { name: string; area: string };
     startsAt: string;
     endsAt?: string;
   };
@@ -108,9 +108,9 @@ export function useConversation(id: string) {
         id: row.id,
         event: {
           id: event.id,
-          title: event.title,
+          title: original(event.title),
           posterUrl: posterSrc(event.poster_url),
-          location: { name: event.location_name, area: event.location_area },
+          location: { name: original(event.location_name), area: original(event.location_area) },
           startsAt: event.starts_at,
           endsAt: event.ends_at ?? undefined,
         },
