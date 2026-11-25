@@ -1,4 +1,3 @@
-import { LocalizedText } from "@/lib/types/i18n";
 import { Profile } from "@/lib/types/user";
 
 export interface Message {
@@ -19,7 +18,8 @@ export interface Message {
 export interface ConversationSummary {
   id: string;
   eventId: string;
-  title: LocalizedText;
+  /** The event's title, as the host wrote it. */
+  title: string;
   posterUrl: string;
   startsAt: string;
   /** False once the chat has gone read-only, a week after the event. */

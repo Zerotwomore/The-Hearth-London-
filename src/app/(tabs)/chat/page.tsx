@@ -11,7 +11,7 @@ import { formatMessageTime } from "@/lib/utils";
 import { chatHref } from "@/lib/routes";
 
 export default function ChatListPage() {
-  const { t, tx, lang, userId, authReady } = useAppState();
+  const { t, lang, userId, authReady } = useAppState();
   const conversations = useMyConversations();
 
   return (
@@ -54,7 +54,7 @@ export default function ChatListPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="truncate text-[15px] font-semibold text-hearth-ink">
-                        {tx(conversation.title)}
+                        {conversation.title}
                       </p>
                       {conversation.lastMessageAt && (
                         <span

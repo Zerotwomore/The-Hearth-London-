@@ -74,9 +74,9 @@ function PendingEvent({ event }: { event: EventDetailItem }) {
             {formatFullDate(event.startsAt, lang)} ·{" "}
             {formatTimeRange(event.startsAt, event.endsAt, lang)}
           </p>
-          <h2 className="display mt-1 text-[18px] text-hearth-ink">{tx(event.title)}</h2>
+          <h2 className="display mt-1 text-[18px] text-hearth-ink">{event.title}</h2>
           <p className="mt-1 text-[13px] text-hearth-charcoal-soft">
-            {tx(event.location.name)} · {tx(event.location.area)}
+            {event.location.name} · {event.location.area}
           </p>
           <p className="mt-1 text-[13px] text-hearth-charcoal-soft">
             {category ? `${tx(category.label)} · ` : ""}
@@ -86,7 +86,7 @@ function PendingEvent({ event }: { event: EventDetailItem }) {
       </Link>
 
       <MarkdownText className="mt-3 text-[14px] leading-relaxed text-hearth-charcoal">
-        {tx(event.description)}
+        {event.description}
       </MarkdownText>
 
       {event.host && (

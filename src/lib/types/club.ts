@@ -11,10 +11,12 @@ export interface ClubPost {
 
 export interface Club {
   id: string;
-  name: LocalizedText;
+  /** Posted content, as written — not translated (see `original`). */
+  name: string;
+  /** A UI label, translated like event categories. */
   category: LocalizedText;
   imageUrl: string;
-  description: LocalizedText;
+  description: string;
   /** Empty when signed out — membership lists are only visible to members. */
   members: Profile[];
 }

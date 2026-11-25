@@ -101,9 +101,9 @@ function EditForm({ event }: { event: EventItem }) {
   const [date, setDate] = useState(localDate(event.startsAt));
   const [startTime, setStartTime] = useState(localTime(event.startsAt));
   const [endTime, setEndTime] = useState(event.endsAt ? localTime(event.endsAt) : "");
-  const [locationName, setLocationName] = useState(event.location.name.en);
-  const [locationArea, setLocationArea] = useState(event.location.area.en);
-  const [description, setDescription] = useState(event.description.en);
+  const [locationName, setLocationName] = useState(event.location.name);
+  const [locationArea, setLocationArea] = useState(event.location.area);
+  const [description, setDescription] = useState(event.description);
   const [formError, setFormError] = useState<StringKey | null>(null);
 
   const complete =

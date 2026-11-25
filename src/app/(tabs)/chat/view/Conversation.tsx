@@ -19,7 +19,7 @@ import { SignInPrompt } from "@/components/auth/SignInPrompt";
 import { ErrorState, LoadingState, StatusMessage } from "@/components/ui/StatusMessage";
 
 export default function Conversation({ id }: { id: string }) {
-  const { tx, t, lang, userId, authReady } = useAppState();
+  const { t, lang, userId, authReady } = useAppState();
   const conversationQuery = useConversation(id);
   const messagesQuery = useMessages(id);
   const send = useSendMessage(id);
@@ -80,7 +80,7 @@ export default function Conversation({ id }: { id: string }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <TopBar
-        title={tx(event.title)}
+        title={event.title}
         subtitle={`${conversation.memberCount} ${t("groupMembers")}`}
         backHref="/chat"
         action={
@@ -100,7 +100,7 @@ export default function Conversation({ id }: { id: string }) {
         className="flex items-center justify-between gap-3 border-b border-hearth-ink/10 bg-hearth-cream-dark/50 px-5 py-2.5 hover:bg-hearth-cream-dark"
       >
         <span className="min-w-0 truncate text-[13px] text-hearth-charcoal">
-          {tx(event.location.name)} · {tx(event.location.area)}
+          {event.location.name} · {event.location.area}
         </span>
         <span className="shrink-0 text-[12px] font-medium text-hearth-ember">
           {t("viewEvent")} →

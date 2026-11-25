@@ -27,7 +27,7 @@ export default function EventsPage() {
   const events = useMemo(() => {
     return listed.filter((event) => {
       const matchesCategory = category === "all" || event.categoryId === category;
-      const haystack = `${event.title.en} ${event.title.zh} ${event.location.area.en} ${event.location.area.zh}`.toLowerCase();
+      const haystack = `${event.title} ${event.location.area}`.toLowerCase();
       const matchesQuery = haystack.includes(query.trim().toLowerCase());
       return matchesCategory && matchesQuery;
     });
